@@ -85,8 +85,6 @@
             box-shadow: 0 10px 40px rgba(163, 95, 163, 0.4);
             z-index: 1001;
             border: 1px solid rgba(255, 182, 193, 0.5);
-            display: flex;
-            flex-direction: column;
         }
 
         .modal-header {
@@ -97,7 +95,6 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-            flex-shrink: 0;
         }
 
         .close-modal {
@@ -116,7 +113,7 @@
         .modal-body {
             padding: 25px;
             overflow-y: auto;
-            flex-grow: 1;
+            max-height: 60vh;
         }
 
         .memory-date {
@@ -135,27 +132,25 @@
             gap: 20px;
         }
 
-        .memory-image-container {
+        .memory-image {
             width: 100%;
-            display: flex;
-            justify-content: center;
-            overflow: hidden;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.4s, box-shadow 0.4s;
             border: 1px solid rgba(232, 84, 136, 0.2);
             background-color: #f8e8e8;
+            min-height: 200px;
+            object-fit: cover;
         }
 
-        .memory-image {
-            max-width: 100%;
-            max-height: 60vh;
-            object-fit: contain;
-            transition: transform 0.4s;
-            display: block;
+        .memory-image.loaded {
+            background-color: transparent;
+            min-height: auto;
         }
 
         .memory-image:hover {
             transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(163, 95, 163, 0.3);
         }
 
         .heart-marker {
@@ -338,10 +333,11 @@
             
             .modal-body {
                 padding: 15px;
+                max-height: 65vh;
             }
             
             .memory-image {
-                max-height: 50vh;
+                min-height: 150px;
             }
         }
 
@@ -361,10 +357,6 @@
                 padding: 6px 12px;
                 bottom: 15px;
                 right: 15px;
-            }
-            
-            .memory-image {
-                max-height: 40vh;
             }
         }
     </style>
@@ -511,7 +503,7 @@
                 ],
                 description: "I remember how nervous I was that evening. When you walked in, the whole world seemed to fade away. We talked for hours about everything and nothing, and I knew right then that this was something special. The way your eyes lit up when you talked about your dreams made me fall for you even more."
             },
-            {
+                        {
                 title: "Our Date at Snow Yogurt (Koh Pich Branch)",
                 lat: 11.5573792,
                 lng: 104.9390181,
@@ -590,7 +582,7 @@
               ${memory.images
                 .map(
                   (src) =>
-                    `<div class="memory-image-container"><img src="${src}" alt="Memory image on ${memory.date}" class="memory-image" loading="lazy" /></div>`
+                    `<img src="${src}" alt="Memory image on ${memory.date}" class="memory-image" loading="lazy" />`
                 )
                 .join('')}
             </div>
