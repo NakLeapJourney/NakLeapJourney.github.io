@@ -399,8 +399,10 @@
                 img.src = imageUrl;
                 img.alt = memory.title;
                 img.className = 'memory-image';
+                img.loading = 'lazy';  // <-- add this line
                 gallery.appendChild(img);
             });
+
             
             document.getElementById('memoryModal').style.display = 'block';
         }
