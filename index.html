@@ -1,19 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Our Romantic Phnom Penh Love Story</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Raleway:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Raleway:ital,wght@0,300;0,400;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Raleway', sans-serif;
             overflow: hidden;
@@ -21,7 +40,7 @@
             background: linear-gradient(135deg, #f9d1d1, #f0c5f0, #d1d1f9);
             color: #5a3e5a;
         }
-        
+
         #map {
             position: absolute;
             top: 0;
@@ -30,7 +49,7 @@
             z-index: 1;
             filter: sepia(0.2) saturate(1.1) brightness(0.95);
         }
-        
+
         .modal-overlay {
             display: none;
             position: fixed;
@@ -42,12 +61,16 @@
             z-index: 1000;
             animation: fadeIn 0.5s;
         }
-        
+
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
-        
+
         .memory-modal {
             position: fixed;
             top: 50%;
@@ -63,7 +86,7 @@
             z-index: 1001;
             border: 1px solid rgba(255, 182, 193, 0.5);
         }
-        
+
         .modal-header {
             padding: 20px;
             background: linear-gradient(to right, #e75488, #c86dd7);
@@ -73,7 +96,7 @@
             align-items: center;
             border-bottom: 2px solid rgba(255, 255, 255, 0.3);
         }
-        
+
         .close-modal {
             background: none;
             border: none;
@@ -82,17 +105,17 @@
             cursor: pointer;
             transition: transform 0.3s;
         }
-        
+
         .close-modal:hover {
             transform: scale(1.2);
         }
-        
+
         .modal-body {
             padding: 25px;
             overflow-y: auto;
             max-height: 60vh;
         }
-        
+
         .memory-date {
             color: #a76ea7;
             margin-bottom: 20px;
@@ -102,13 +125,13 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .memory-gallery {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
-        
+
         .memory-image {
             width: 100%;
             border-radius: 10px;
@@ -116,12 +139,12 @@
             transition: transform 0.4s, box-shadow 0.4s;
             border: 1px solid rgba(232, 84, 136, 0.2);
         }
-        
+
         .memory-image:hover {
             transform: scale(1.02);
             box-shadow: 0 8px 25px rgba(163, 95, 163, 0.3);
         }
-        
+
         .heart-marker {
             background: linear-gradient(145deg, #ff6b9d, #e75488);
             width: 36px;
@@ -138,17 +161,23 @@
             transition: all 0.3s ease;
             animation: pulse 2s infinite;
         }
-        
+
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(231, 84, 136, 0.6); }
-            70% { box-shadow: 0 0 0 12px rgba(231, 84, 136, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(231, 84, 136, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(231, 84, 136, 0.6);
+            }
+            70% {
+                box-shadow: 0 0 0 12px rgba(231, 84, 136, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(231, 84, 136, 0);
+            }
         }
-        
+
         .heart-marker:hover {
             transform: scale(1.15);
         }
-        
+
         .map-title {
             position: absolute;
             top: 20px;
@@ -164,7 +193,7 @@
             border: 1px solid rgba(255, 255, 255, 0.5);
             max-width: 90%;
         }
-        
+
         .map-title h1 {
             font-family: 'Dancing Script', cursive;
             font-size: 2.5em;
@@ -172,14 +201,14 @@
             margin-bottom: 8px;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
-        
+
         .map-title p {
             font-family: 'Playfair Display', serif;
             font-size: 1.1em;
             color: #5a3e5a;
             font-style: italic;
         }
-        
+
         .memory-description {
             font-family: 'Playfair Display', serif;
             font-size: 1.1em;
@@ -191,7 +220,7 @@
             border-radius: 10px;
             border-left: 4px solid #e75488;
         }
-        
+
         /* Floating hearts background */
         .hearts-container {
             position: fixed;
@@ -203,7 +232,7 @@
             z-index: 0;
             overflow: hidden;
         }
-        
+
         .heart {
             position: absolute;
             color: rgba(231, 84, 136, 0.15);
@@ -211,7 +240,7 @@
             animation: float 15s infinite linear;
             opacity: 0;
         }
-        
+
         @keyframes float {
             0% {
                 transform: translateY(100vh) rotate(0deg);
@@ -228,7 +257,7 @@
                 opacity: 0;
             }
         }
-        
+
         /* Footer styling */
         .footer {
             position: absolute;
@@ -242,7 +271,7 @@
             font-size: 0.9em;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         }
-        
+
         /* Photo counter */
         .photo-counter {
             position: absolute;
@@ -259,91 +288,84 @@
             align-items: center;
             gap: 5px;
         }
-        
+
         .heart-icon {
             color: #e75488;
             font-size: 1.2em;
             animation: heartbeat 1.5s infinite;
         }
-        
+
         @keyframes heartbeat {
-            0% { transform: scale(1); }
-            14% { transform: scale(1.3); }
-            28% { transform: scale(1); }
-            42% { transform: scale(1.3); }
-            70% { transform: scale(1); }
-        }
-        
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .map-title {
-                padding: 15px 20px;
-                width: 90%;
-                border-radius: 20px;
+            0% {
+                transform: scale(1);
             }
-            
-            .map-title h1 {
-                font-size: 1.8em;
+            50% {
+                transform: scale(1.2);
             }
-            
-            .map-title p {
-                font-size: 0.9em;
-            }
-            
-            .modal-body {
-                padding: 15px;
+            100% {
+                transform: scale(1);
             }
         }
     </style>
 </head>
 <body>
-    <div class="hearts-container" id="heartsContainer"></div>
-    
-    <div id="map"></div>
-    
     <div class="map-title">
-        <h1>Our Journey in Phnom Penh</h1>
-        <p>Every heart holds a precious memory of our love story</p>
+        <h1>Our Romantic Phnom Penh Love Story</h1>
+        <p>Memories captured on this beautiful journey</p>
     </div>
-    
-    <div class="modal-overlay" id="memoryModal">
-        <div class="memory-modal">
+
+    <div id="map"></div>
+
+    <div class="footer">
+        &copy; 2025 Our Love Story
+    </div>
+
+    <div class="photo-counter" aria-live="polite">
+        <i class="fa-solid fa-heart heart-icon"></i>
+        <span id="memory-count"></span> Memories
+    </div>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
+        <div class="memory-modal" role="document">
             <div class="modal-header">
-                <h2 id="memoryTitle"><i class="fas fa-heart"></i> Memory Location</h2>
-                <button class="close-modal">&times;</button>
+                <h2 id="modal-title">Memory Details</h2>
+                <button class="close-modal" id="close-modal" aria-label="Close Memory Details">&times;</button>
             </div>
-            <div class="modal-body">
-                <p class="memory-date"><i class="fas fa-calendar-alt"></i> Visited on <span id="memoryDate">January 1, 2023</span></p>
-                <div class="memory-description" id="memoryDescription">Our very first date where we talked for hours over coffee</div>
-                <div class="memory-gallery" id="memoryGallery"></div>
+            <div class="modal-body" id="modal-body">
+                <!-- Filled dynamically -->
             </div>
         </div>
     </div>
-    
-    <div class="photo-counter">
-        <i class="fas fa-heart heart-icon"></i>
-        <span>12 Shared Memories</span>
-    </div>
-    
-    <div class="footer">
-        Made with <i class="fas fa-heart" style="color: #e75488;"></i> in Phnom Penh
-    </div>
+
+    <!-- Floating hearts container -->
+    <div class="hearts-container"></div>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
     <script>
-        // Create floating hearts
-        const heartsContainer = document.getElementById('heartsContainer');
-        for (let i = 0; i < 25; i++) {
+        // Floating hearts effect
+        const heartsContainer = document.querySelector('.hearts-container');
+        function createHeart() {
             const heart = document.createElement('div');
-            heart.className = 'heart';
-            heart.innerHTML = '❤';
+            heart.classList.add('heart');
             heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.animationDelay = Math.random() * 15 + 's';
-            heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+            heart.style.fontSize = (10 + Math.random() * 20) + 'px';
+            heart.style.animationDuration = (10 + Math.random() * 10) + 's';
             heartsContainer.appendChild(heart);
+
+            // Use FontAwesome heart icon
+            heart.innerHTML = '<i class="fa-solid fa-heart"></i>';
+
+            setTimeout(() => {
+                heart.remove();
+            }, 20000);
         }
-        
-        // Couple's memory locations in Phnom Penh
+
+        setInterval(createHeart, 400);
+
+        // Memory Data
         const memories = [
             {
                 title: "Our First Date at The Playroom - Cambodia",
@@ -360,7 +382,7 @@
                 description: "I remember how nervous I was that evening. When you walked in, the whole world seemed to fade away. We talked for hours about everything and nothing, and I knew right then that this was something special. The way your eyes lit up when you talked about your dreams made me fall for you even more."
             },
                         {
-                title: "Our First Date at The Playroom - Cambodia",
+                title: "Our Second Date at The Playroom - Cambodia",
                 lat: 11.5818057,
                 lng: 104.8983989,
                 date: "January 25, 2025",
@@ -375,69 +397,100 @@
             },
         ];
 
+
+        // Update memory count
+        document.getElementById('memory-count').textContent = memories.length;
+
         // Initialize the map
         const map = L.map('map').setView([11.5564, 104.9282], 14);
-        
+
         // Add OpenStreetMap tiles
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
-        
-        // Add heart markers for each memory
-        memories.forEach((memory, index) => {
-            const marker = L.marker([memory.lat, memory.lng], {
-                icon: L.divIcon({
-                    className: 'heart-marker',
-                    html: '♥',
-                    iconSize: [36, 36]
-                })
-            }).addTo(map);
-            
-            // Add click event to show memory
-            marker.on('click', () => {
-                showMemoryModal(memory);
-            });
-        });
-        
-        // Show memory in modal
-        function showMemoryModal(memory) {
-            document.getElementById('memoryTitle').innerHTML = `<i class="fas fa-heart"></i> ${memory.title}`;
-            document.getElementById('memoryDate').textContent = memory.date;
-            document.getElementById('memoryDescription').textContent = memory.description;
-            
-            const gallery = document.getElementById('memoryGallery');
-            gallery.innerHTML = '';
-            
-            memory.images.forEach(imageUrl => {
-                const img = document.createElement('img');
-                img.src = imageUrl;
-                img.alt = memory.title;
-                img.className = 'memory-image';
-                img.loading = 'lazy';  // <-- add this line
-                gallery.appendChild(img);
-            });
 
-            
-            document.getElementById('memoryModal').style.display = 'block';
+        // Create marker cluster group with custom cluster icon
+        const markers = L.markerClusterGroup({
+          iconCreateFunction: function(cluster) {
+            return L.divIcon({
+              html: `<div style="
+                background: #e75488;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                color: white;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                font-weight:bold;
+                box-shadow: 0 0 10px #e75488;">
+                ♥ ${cluster.getChildCount()}
+              </div>`,
+              className: 'custom-cluster-icon',
+              iconSize: L.point(40, 40)
+            });
+          }
+        });
+
+        // Add markers to cluster group
+        memories.forEach((memory) => {
+          const marker = L.marker([memory.lat, memory.lng], {
+            icon: L.divIcon({
+              className: 'heart-marker',
+              html: '♥',
+              iconSize: [36, 36]
+            })
+          });
+
+          marker.on('click', () => {
+            showMemoryModal(memory);
+          });
+
+          markers.addLayer(marker);
+        });
+
+        map.addLayer(markers);
+
+        // Modal functionality
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalBody = document.getElementById('modal-body');
+        const closeModalBtn = document.getElementById('close-modal');
+
+        function showMemoryModal(memory) {
+          modalBody.innerHTML = `
+            <div class="memory-date"><i class="fa-solid fa-calendar-day"></i> ${memory.date}</div>
+            <div class="memory-description">${memory.description}</div>
+            <div class="memory-gallery">
+              ${memory.images
+                .map(
+                  (src) =>
+                    `<img src="${src}" alt="Memory image on ${memory.date}" class="memory-image" loading="lazy" />`
+                )
+                .join('')}
+            </div>
+          `;
+          modalOverlay.style.display = 'block';
+          modalOverlay.focus();
+          document.body.style.overflow = 'hidden'; // Prevent background scroll
         }
-        
-        // Close modal
-        document.querySelector('.close-modal').addEventListener('click', () => {
-            document.getElementById('memoryModal').style.display = 'none';
+
+        function closeMemoryModal() {
+          modalOverlay.style.display = 'none';
+          document.body.style.overflow = '';
+        }
+
+        closeModalBtn.addEventListener('click', closeMemoryModal);
+        modalOverlay.addEventListener('click', (e) => {
+          if (e.target === modalOverlay) {
+            closeMemoryModal();
+          }
         });
-        
-        // Close modal when clicking outside
-        document.getElementById('memoryModal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('memoryModal')) {
-                document.getElementById('memoryModal').style.display = 'none';
-            }
-        });
-        
-        // Close modal with ESC key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                document.getElementById('memoryModal').style.display = 'none';
-            }
+
+        // Accessibility: close modal on Escape key
+        window.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && modalOverlay.style.display === 'block') {
+            closeMemoryModal();
+          }
         });
     </script>
 </body>
