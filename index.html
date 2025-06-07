@@ -344,69 +344,39 @@
         }
         
         // Couple's memory locations in Phnom Penh
-        const memories = [
-            {
-                title: "Our First Date at Brown Coffee",
-                lat: 11.5695,
-                lng: 104.9289,
-                date: "March 15, 2022",
-                images: [
-                    "https://images.unsplash.com/photo-1498804103079-a6351b050096?w=800",
-                    "https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=800"
-                ],
-                description: "I remember how nervous I was that evening. When you walked in, the whole world seemed to fade away. We talked for hours about everything and nothing, and I knew right then that this was something special. The way your eyes lit up when you talked about your dreams made me fall for you even more."
-            },
-            {
-                title: "Romantic Dinner at Malis",
-                lat: 11.5632,
-                lng: 104.9281,
-                date: "April 20, 2022",
-                images: [
-                    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800"
-                ],
-                description: "Our one-month anniversary! You surprised me with this beautiful restaurant. I'll never forget how the candlelight reflected in your eyes as you reached across the table to hold my hand. The way you tried to feed me that dessert even though we were both so full - that's when I realized how thoughtful you really are."
-            },
-            {
-                title: "Sunset at Wat Phnom",
-                lat: 11.5765,
-                lng: 104.9230,
-                date: "May 3, 2022",
-                images: [
-                    "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=800",
-                    "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800"
-                ],
-                description: "The sky was painted in hues of orange and pink, but all I could see was you. When you put your arm around me as we watched the sunset, I felt like the luckiest person in the world. That moment, with the temple bells ringing softly in the distance, will forever be etched in my heart."
-            },
-            {
-                title: "Biking Along the Riverside",
-                lat: 11.5726,
-                lng: 104.9293,
-                date: "June 10, 2022",
-                images: [
-                    "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800"
-                ],
-                description: "Remember how we kept bumping into each other because we were too busy laughing to steer straight? That day was pure joy. I loved how you raced ahead only to circle back to ride beside me. The wind in our hair, the river beside us, and your laughter - it was absolute perfection."
-            },
-            {
-                title: "Royal Palace Visit",
-                lat: 11.5622,
-                lng: 104.9303,
-                date: "July 4, 2022",
-                images: [
-                    "https://images.unsplash.com/photo-1533856493584-0c6ca8ca9ce3?w=800",
-                    "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=800"
-                ],
-                description: "You looked so adorable trying to take the perfect photo for me. I was mesmerized by the palace, but even more by the way your face lit up explaining its history to me. When we got caught in that sudden downpour and ran laughing to take shelter, I knew these were the moments I'd cherish forever."
-            }
-        ];
+        // Load external JSON
+        fetch('memories.json')
+        .then(response => response.json())
+        .then(memories => {
+            memories.forEach(memory => {
+            const marker = L.marker([memory.lat, memory.lng]).addTo(map);
+
+            let popupContent = `
+                <h3>${memory.title}</h3>
+                <p><strong>${memory.date}</strong></p>
+            `;
+
+            memory.images.forEach(img => {
+                popupContent += `<img src="${img}" alt="Memory image">`;
+            });
+
+            popupContent += `<p>${memory.description}</p>`;
+
+            marker.bindPopup(popupContent);
+            });
+        })
+        .catch(err => console.error('Failed to load memories:', err));
 
         // Initialize the map
         const map = L.map('map').setView([11.5564, 104.9282], 14);
         
-        // Add OpenStreetMap tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg', {
+            attribution: '&copy; <a href="https://stamen.com/">Stamen Design</a>, <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
+            subdomains: 'abcd',
+            minZoom: 1,
+            maxZoom: 16
         }).addTo(map);
+
         
         // Add heart markers for each memory
         memories.forEach((memory, index) => {
