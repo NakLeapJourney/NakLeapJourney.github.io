@@ -30,8 +30,8 @@ for root, dirs, files in os.walk(PHOTO_DIR):
                 # Save as high quality JPEG
                 image.save(jpg_path, "JPEG", quality=100, subsampling=0)
 
-                # # Delete the original HEIC file
-                # os.remove(heic_path)
+                # Delete the original HEIC file
+                os.remove(heic_path)
 
                 print(f"Converted and saved: {jpg_path}")
                 counter += 1
