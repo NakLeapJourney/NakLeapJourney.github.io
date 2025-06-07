@@ -138,6 +138,14 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             transition: transform 0.4s, box-shadow 0.4s;
             border: 1px solid rgba(232, 84, 136, 0.2);
+            background-color: #f8e8e8;
+            min-height: 200px;
+            object-fit: cover;
+        }
+
+        .memory-image.loaded {
+            background-color: transparent;
+            min-height: auto;
         }
 
         .memory-image:hover {
@@ -180,33 +188,35 @@
 
         .map-title {
             position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 0;
+            left: 0;
+            right: 0;
             z-index: 100;
-            background: rgba(255, 255, 255, 0.85);
-            padding: 20px 30px;
-            border-radius: 50px;
-            box-shadow: 0 5px 25px rgba(163, 95, 163, 0.3);
+            background: linear-gradient(to right, rgba(231, 84, 136, 0.9), rgba(200, 109, 215, 0.9));
+            padding: 15px 0;
             text-align: center;
             backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            max-width: 90%;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 20px rgba(163, 95, 163, 0.4);
         }
 
         .map-title h1 {
             font-family: 'Dancing Script', cursive;
-            font-size: 2.5em;
-            color: #e75488;
-            margin-bottom: 8px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            font-size: 2.2rem;
+            color: white;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+            padding: 0 20px;
         }
 
         .map-title p {
             font-family: 'Playfair Display', serif;
-            font-size: 1.1em;
-            color: #5a3e5a;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.9);
             font-style: italic;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            padding: 0 20px;
         }
 
         .memory-description {
@@ -306,6 +316,49 @@
                 transform: scale(1);
             }
         }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .map-title h1 {
+                font-size: 1.8rem;
+            }
+            
+            .map-title p {
+                font-size: 0.9rem;
+            }
+            
+            .memory-modal {
+                width: 95%;
+            }
+            
+            .modal-body {
+                padding: 15px;
+                max-height: 65vh;
+            }
+            
+            .memory-image {
+                min-height: 150px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .map-title h1 {
+                font-size: 1.5rem;
+                padding: 0 15px;
+            }
+            
+            .map-title p {
+                font-size: 0.8rem;
+                padding: 0 15px;
+            }
+            
+            .photo-counter {
+                font-size: 0.8em;
+                padding: 6px 12px;
+                bottom: 15px;
+                right: 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -381,22 +434,21 @@
                 ],
                 description: "I remember how nervous I was that evening. When you walked in, the whole world seemed to fade away. We talked for hours about everything and nothing, and I knew right then that this was something special. The way your eyes lit up when you talked about your dreams made me fall for you even more."
             },
-                        {
-                title: "Our Second Date at The Playroom - Cambodia",
+            {
+                title: "Our Date at AEON Sen Sok",
                 lat: 11.5818057,
                 lng: 104.8983989,
-                date: "January 25, 2025",
+                date: "January 31, 2025",
                 images: [
-                    "photo/25Jan2025/1.jpg",
-                    "photo/25Jan2025/2.jpg",
-                    "photo/25Jan2025/3.jpg",
-                    "photo/25Jan2025/4.jpg",
-                    "photo/25Jan2025/5.jpg"
+                    "photo/31Jan2025/1.jpg",
+                    "photo/31Jan2025/2.jpg",
+                    "photo/31Jan2025/3.jpg",
+                    "photo/31Jan2025/4.jpg",
+                    "photo/31Jan2025/5.jpg"
                 ],
                 description: "I remember how nervous I was that evening. When you walked in, the whole world seemed to fade away. We talked for hours about everything and nothing, and I knew right then that this was something special. The way your eyes lit up when you talked about your dreams made me fall for you even more."
             },
         ];
-
 
         // Update memory count
         document.getElementById('memory-count').textContent = memories.length;
@@ -469,9 +521,35 @@
                 .join('')}
             </div>
           `;
+          
+          // Set modal title
+          document.getElementById('modal-title').textContent = memory.title;
+          
           modalOverlay.style.display = 'block';
           modalOverlay.focus();
-          document.body.style.overflow = 'hidden'; // Prevent background scroll
+          document.body.style.overflow = 'hidden';
+          
+          // Load images with intersection observer for better performance
+          const images = modalBody.querySelectorAll('.memory-image');
+          const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.getAttribute('src');
+                img.onload = () => {
+                  img.classList.add('loaded');
+                };
+                observer.unobserve(img);
+              }
+            });
+          }, {
+            root: modalBody,
+            rootMargin: '100px'
+          });
+
+          images.forEach(img => {
+            imageObserver.observe(img);
+          });
         }
 
         function closeMemoryModal() {
