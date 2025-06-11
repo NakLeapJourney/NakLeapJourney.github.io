@@ -1,0 +1,5730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Assessing MSME Market Dynamics and Resilience in Phnom Penh</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    .custom-label {
+      font-family: 'Roboto', sans-serif;
+      font-size: 14px;
+      font-weight: bold; 
+      color: black;
+      text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;
+      background: transparent;
+      border: none;
+      padding: 2px;
+    }
+    .custom-tooltip {
+      font-family: 'Roboto', sans-serif;
+      font-size: 12px;
+      padding: 5px;
+    }
+    #app-container {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    #main-content {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+    .sidebar-btn {
+    @apply w-10 h-10 flex items-center justify-center text-xl text-gray-600 rounded hover:bg-gray-200;
+    }
+    .sidebar-btn.active {
+    @apply bg-gray-300 text-gray-800;
+    }
+  </style>
+</head>
+
+<body class="font-roboto text-gray-800">
+  <div id="app-container">
+    <header class="bg-[#336666] flex items-center justify-between px-4 py-4 shadow-md">
+      <div class="w-[100px] md:w-[120px]">
+        <img src="https://cdri.org.kh/storage/images/CDRI%20Logo_1704186788.png" alt="CDRI Logo" class="w-full h-auto" />
+      </div>
+      <h2 class="text-white text-xs sm:text-sm md:text-lg font-bold text-right flex-1 leading-snug md:leading-tight">
+        MSME Market Dynamics and Resilience in Phnom Penh
+      </h2>
+    </header>
+
+    <div id="main-content" class="flex flex-col sm:flex-row h-screen">
+      <!-- Sidebar Menu -->
+      <aside class="w-full sm:w-24 bg-gradient-to-b from-[#2a4e4e] to-[#1a3636] border-b sm:border-b-0 sm:border-r border-gray-200 flex sm:flex-col flex-row items-center justify-around sm:items-center py-2 sm:py-6 space-y-0 sm:space-y-8 shadow-lg">
+        <button data-index="0" class="sidebar-btn active group" onclick="showSection(0)" title="Overview">
+          <div class="flex flex-col items-center">
+            <div class="bg-[#3a5f5f] group-hover:bg-[#4a7f7f] group-[.active]:bg-[#5a9f9f] p-3 rounded-xl transition-all duration-300 shadow-md group-[.active]:shadow-lg">
+              <span class="text-xl text-white">🏠</span>
+            </div>
+            <span class="text-xs mt-2 text-gray-200 group-hover:text-white group-[.active]:text-white font-medium transition-colors">Overview</span>
+          </div>
+        </button>
+        <button data-index="1" class="sidebar-btn group" onclick="showSection(1)" title="Map">
+          <div class="flex flex-col items-center">
+            <div class="bg-[#3a5f5f] group-hover:bg-[#4a7f7f] group-[.active]:bg-[#5a9f9f] p-3 rounded-xl transition-all duration-300 shadow-md group-[.active]:shadow-lg">
+              <span class="text-xl text-white">📍</span>
+            </div>
+            <span class="text-xs mt-2 text-gray-200 group-hover:text-white group-[.active]:text-white font-medium transition-colors">Map</span>
+          </div>
+        </button>
+        <button data-index="2" class="sidebar-btn group" onclick="showSection(2)" title="Compare">
+          <div class="flex flex-col items-center">
+            <div class="bg-[#3a5f5f] group-hover:bg-[#4a7f7f] group-[.active]:bg-[#5a9f9f] p-3 rounded-xl transition-all duration-300 shadow-md group-[.active]:shadow-lg">
+              <span class="text-xl text-white">⚖️</span>
+            </div>
+            <span class="text-xs mt-2 text-gray-200 group-hover:text-white group-[.active]:text-white font-medium transition-colors">Compare</span>
+          </div>
+        </button>
+      </aside>
+
+
+
+      <!-- Main Content -->
+      <main class="flex-1 overflow-auto p-4">
+            <!-- Section 1: Overview -->
+            <section id="section-0">
+              <h2 class="text-xl font-semibold mb-4">Statistics</h2>
+              <p class="text-gray-600">Content for statistics goes here.</p>
+            </section>
+
+            <!-- Section 1: Map -->
+            <section id="section-1" class="h-full hidden">
+            <!-- (your original map section) -->
+            <div class="bg-white rounded-lg shadow-md overflow-visible h-full flex flex-col">
+                <div id="leaflet-map" class="w-full flex-1 min-h-0 p-2 border border-gray-200 rounded-lg"></div>
+                <div class="p-4 border-t border-gray-100">
+                <p class="flex items-center justify-center gap-2 text-sm text-gray-600 italic bg-gray-100 py-2 p-4 rounded-md mb-4">
+                    <span class="text-amber-500">💡</span> Click on each Sangkat to see detail
+                </p>
+                <div class="grid grid-cols-1 gap-4 sm:flex sm:items-center sm:justify-between sm:gap-6">
+                    <select id="dataset-selector" class="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg font-medium text-sm md:text-base">
+                    <option value="open">Number of open establishments in the last 12 months</option>
+                    <option value="closed">Number of closed establishments in the last 12 months</option>
+                    <option value="dataset2">Number of establishments by year of opening</option>
+                    </select>
+                    <div class="flex items-center gap-2 w-full">
+                    <div class="flex gap-2">
+                        <button id="play-button" class="px-3 py-2 text-white rounded-lg font-medium flex items-center text-xs bg-[#336666] hover:bg-[#2b5555]">
+                        <!-- Play Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                        </svg>
+                        </button>
+                        <button id="stop-button" class="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium flex items-center text-xs hover:bg-gray-300" disabled>
+                        <!-- Stop Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2 flex-1 min-w-0">
+                        <span id="time-period-label" class="text-xs font-medium text-gray-700 whitespace-nowrap">Time:</span>
+                        <input type="range" id="time-slider" min="0" max="11" value="0" class="flex-1 h-2 bg-gray-200 rounded-lg cursor-pointer" />
+                        <span id="time-label" class="text-xs font-medium text-gray-700 whitespace-nowrap">January 2025</span>
+                    </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+            </section>
+
+            <!-- Section 3: Compare -->
+            <section id="section-2" class="h-full hidden">
+                <div class="bg-white rounded-lg shadow-md overflow-visible h-full flex flex-col">
+                    <!-- Dataset selector at the top -->
+                    <div class="p-4 border-b">
+                        <div class="flex flex-wrap gap-4 justify-center sm:justify-start">
+                            <select id="dataset-select" class="px-4 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto text-sm sm:text-base">
+                                <option value="compare-dataset3">Operating and Closed Establishments by Sangkat</option>
+                                <option value="compare-dataset5">Open Establishments by Sangkat</option>
+                                <option value="compare-dataset6">Registration Status by Sangkat</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Visualization area below -->
+                    <div class="p-4 flex-1 overflow-auto">
+                        <div id="compare-bar-chart-status" class="w-full h-full"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+  </div>
+
+  <div id="map-modal" class="hidden fixed z-[1000] inset-0 bg-black bg-opacity-50">
+    <div class="bg-white m-[5%] mx-auto p-5 rounded-lg w-4/5 max-w-[90vw] shadow-lg relative max-h-[90vh] overflow-y-auto">
+      <span class="close-button absolute right-4 top-3 text-2xl font-bold text-gray-400 cursor-pointer hover:text-gray-600">×</span>
+      <div id="modal-content">
+        <h3 id="modal-district" class="text-lg font-bold mb-2"></h3>
+        <p id="modal-value" class="text-gray-600"></p>
+        <p id="modal-status" class="text-gray-600"></p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h4 class="text-md font-semibold mb-2">Operating and closed establishments</h4>
+            <div id="pie-chart-status" class="w-full h-64"></div>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h4 class="text-md font-semibold mb-2">Monthly trends of new and closed establishments</h4>
+            <div id="line-chart-trends" class="w-full h-64"></div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h4 class="text-md font-semibold mb-2">Proportion of opened and closed establishments by type</h4>
+            <div id="pie-chart-type" class="w-full h-64"></div>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h4 class="text-md font-semibold mb-2">Number of establishments by year of opening</h4>
+            <div id="line-chart-years" class="w-full h-64"></div>
+          </div>
+        </div>
+      </div>
+      <p class="text-center text-gray-600 italic">Data source: Cambodia Development Resource Institute</p>
+    </div>
+  </div>
+
+  <script>
+    // Update showSection to handle chart rendering
+    function showSection(index) {
+      document.querySelectorAll('main section').forEach((sec, i) => {
+        sec.classList.toggle('hidden', i !== index);
+      });
+      document.querySelectorAll('aside button').forEach((btn, i) => {
+        btn.classList.toggle('active', i === index);
+      });
+
+      // Render or update chart when Compare section is shown
+      if (index === 2) {
+        setTimeout(() => {
+          renderSangkatStackedBarChart();
+          // Trigger animation explicitly after section is shown
+          if (chart) {
+            chart.setOption(chart.getOption(), {
+              notMerge: true, // Force re-render to trigger animations
+              animation: true,
+              animationDuration: 1000,
+              animationEasing: 'linear' // Default easing
+            });
+            chart.resize({
+              animation: {
+                duration: 1000,
+                easing: 'linear' // Default easing
+              }
+            });
+          }
+        }, 0);
+      }
+    }
+  </script>
+
+  <script>
+    // Placeholder datasets (i will  replace with actual data)
+    const datasets = {
+      dataset1: [
+    {
+        "month": "2024-04-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 16,
+        "status": "New"
+    },
+    {
+        "month": "2024-04-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 18,
+        "status": "New"
+    },
+    {
+        "month": "2024-04-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 17,
+        "status": "New"
+    },
+    {
+        "month": "2024-04-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 25,
+        "status": "New"
+    },
+    {
+        "month": "2024-04-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 13,
+        "status": "New"
+    },
+    {
+        "month": "2024-04-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 12,
+        "status": "New"
+    },
+    {
+        "month": "2024-04-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 17,
+        "status": "New"
+    },
+    {
+        "month": "2024-05-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 2,
+        "status": "New"
+    },
+    {
+        "month": "2024-05-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 7,
+        "status": "New"
+    },
+    {
+        "month": "2024-05-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 24,
+        "status": "New"
+    },
+    {
+        "month": "2024-05-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 12,
+        "status": "New"
+    },
+    {
+        "month": "2024-05-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 17,
+        "status": "New"
+    },
+    {
+        "month": "2024-05-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 11,
+        "status": "New"
+    },
+    {
+        "month": "2024-05-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 6,
+        "status": "New"
+    },
+    {
+        "month": "2024-06-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 9,
+        "status": "New"
+    },
+    {
+        "month": "2024-06-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 14,
+        "status": "New"
+    },
+    {
+        "month": "2024-06-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 21,
+        "status": "New"
+    },
+    {
+        "month": "2024-06-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 12,
+        "status": "New"
+    },
+    {
+        "month": "2024-06-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 22,
+        "status": "New"
+    },
+    {
+        "month": "2024-06-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 12,
+        "status": "New"
+    },
+    {
+        "month": "2024-06-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 7,
+        "status": "New"
+    },
+    {
+        "month": "2024-07-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 9,
+        "status": "New"
+    },
+    {
+        "month": "2024-07-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 12,
+        "status": "New"
+    },
+    {
+        "month": "2024-07-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 9,
+        "status": "New"
+    },
+    {
+        "month": "2024-07-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 19,
+        "status": "New"
+    },
+    {
+        "month": "2024-07-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 16,
+        "status": "New"
+    },
+    {
+        "month": "2024-07-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 7,
+        "status": "New"
+    },
+    {
+        "month": "2024-07-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 10,
+        "status": "New"
+    },
+    {
+        "month": "2024-08-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 8,
+        "status": "New"
+    },
+    {
+        "month": "2024-08-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 12,
+        "status": "New"
+    },
+    {
+        "month": "2024-08-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 16,
+        "status": "New"
+    },
+    {
+        "month": "2024-08-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 17,
+        "status": "New"
+    },
+    {
+        "month": "2024-08-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 21,
+        "status": "New"
+    },
+    {
+        "month": "2024-08-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 11,
+        "status": "New"
+    },
+    {
+        "month": "2024-08-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 10,
+        "status": "New"
+    },
+    {
+        "month": "2024-09-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 6,
+        "status": "New"
+    },
+    {
+        "month": "2024-09-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 4,
+        "status": "New"
+    },
+    {
+        "month": "2024-09-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 17,
+        "status": "New"
+    },
+    {
+        "month": "2024-09-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 11,
+        "status": "New"
+    },
+    {
+        "month": "2024-09-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 15,
+        "status": "New"
+    },
+    {
+        "month": "2024-09-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 9,
+        "status": "New"
+    },
+    {
+        "month": "2024-09-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 8,
+        "status": "New"
+    },
+    {
+        "month": "2024-10-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 13,
+        "status": "New"
+    },
+    {
+        "month": "2024-10-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 12,
+        "status": "New"
+    },
+    {
+        "month": "2024-10-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 24,
+        "status": "New"
+    },
+    {
+        "month": "2024-10-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 27,
+        "status": "New"
+    },
+    {
+        "month": "2024-10-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 17,
+        "status": "New"
+    },
+    {
+        "month": "2024-10-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 21,
+        "status": "New"
+    },
+    {
+        "month": "2024-10-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 16,
+        "status": "New"
+    },
+    {
+        "month": "2024-11-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 9,
+        "status": "New"
+    },
+    {
+        "month": "2024-11-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 13,
+        "status": "New"
+    },
+    {
+        "month": "2024-11-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 30,
+        "status": "New"
+    },
+    {
+        "month": "2024-11-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 28,
+        "status": "New"
+    },
+    {
+        "month": "2024-11-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 31,
+        "status": "New"
+    },
+    {
+        "month": "2024-11-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 17,
+        "status": "New"
+    },
+    {
+        "month": "2024-11-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 17,
+        "status": "New"
+    },
+    {
+        "month": "2024-12-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 10,
+        "status": "New"
+    },
+    {
+        "month": "2024-12-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 12,
+        "status": "New"
+    },
+    {
+        "month": "2024-12-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 23,
+        "status": "New"
+    },
+    {
+        "month": "2024-12-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 28,
+        "status": "New"
+    },
+    {
+        "month": "2024-12-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 31,
+        "status": "New"
+    },
+    {
+        "month": "2024-12-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 20,
+        "status": "New"
+    },
+    {
+        "month": "2024-12-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 23,
+        "status": "New"
+    },
+    {
+        "month": "2025-01-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 28,
+        "status": "New"
+    },
+    {
+        "month": "2025-01-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 29,
+        "status": "New"
+    },
+    {
+        "month": "2025-01-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 69,
+        "status": "New"
+    },
+    {
+        "month": "2025-01-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 69,
+        "status": "New"
+    },
+    {
+        "month": "2025-01-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 74,
+        "status": "New"
+    },
+    {
+        "month": "2025-01-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 67,
+        "status": "New"
+    },
+    {
+        "month": "2025-01-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 51,
+        "status": "New"
+    },
+    {
+        "month": "2025-02-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 17,
+        "status": "New"
+    },
+    {
+        "month": "2025-02-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 23,
+        "status": "New"
+    },
+    {
+        "month": "2025-02-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 45,
+        "status": "New"
+    },
+    {
+        "month": "2025-02-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 49,
+        "status": "New"
+    },
+    {
+        "month": "2025-02-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 57,
+        "status": "New"
+    },
+    {
+        "month": "2025-02-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 44,
+        "status": "New"
+    },
+    {
+        "month": "2025-02-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 25,
+        "status": "New"
+    },
+    {
+        "month": "2025-03-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 19,
+        "status": "New"
+    },
+    {
+        "month": "2025-03-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 13,
+        "status": "New"
+    },
+    {
+        "month": "2025-03-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 34,
+        "status": "New"
+    },
+    {
+        "month": "2025-03-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 27,
+        "status": "New"
+    },
+    {
+        "month": "2025-03-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 44,
+        "status": "New"
+    },
+    {
+        "month": "2025-03-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 26,
+        "status": "New"
+    },
+    {
+        "month": "2025-03-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 17,
+        "status": "New"
+    },
+    {
+        "month": "2024-04-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 2,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-04-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 7,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-04-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 7,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-04-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 8,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-04-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 8,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-04-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 5,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-04-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 5,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-05-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 3,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-05-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 3,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-05-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 12,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-05-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 4,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-05-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 8,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-05-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 6,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-05-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 4,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-06-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 4,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-06-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 14,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-06-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 10,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-06-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 17,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-06-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 5,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-06-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 6,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-06-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 8,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-07-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 5,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-07-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 4,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-07-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 4,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-07-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 7,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-07-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 10,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-07-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 4,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-07-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 2,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-08-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 3,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-08-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 5,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-08-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 11,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-08-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 4,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-08-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 8,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-08-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 7,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-08-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 6,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-09-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 4,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-09-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 9,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-09-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 12,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-09-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 6,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-09-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 19,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-09-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 10,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-09-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 2,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-10-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 8,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-10-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 4,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-10-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 11,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-10-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 16,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-10-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 16,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-10-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 15,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-10-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 9,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-11-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 2,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-11-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 3,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-11-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 12,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-11-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 15,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-11-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 23,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-11-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 12,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-11-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 4,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-12-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 5,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-12-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 8,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-12-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 15,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-12-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 14,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-12-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 29,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-12-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 13,
+        "status": "Closed"
+    },
+    {
+        "month": "2024-12-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 13,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-01-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 2,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-01-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 7,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-01-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 21,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-01-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 20,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-01-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 27,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-01-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 24,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-01-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 12,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-02-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 8,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-02-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 7,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-02-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 16,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-02-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 16,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-02-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 27,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-02-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 7,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-02-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 10,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-03-01T00:00:00",
+        "a3": "Chak Angrae Leu",
+        "count": 4,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-03-01T00:00:00",
+        "a3": "Chak Angrae Kraom",
+        "count": 10,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-03-01T00:00:00",
+        "a3": "Stueng Mean Chey 1",
+        "count": 10,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-03-01T00:00:00",
+        "a3": "Stueng Mean Chey 2",
+        "count": 12,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-03-01T00:00:00",
+        "a3": "Stueng Mean Chey 3",
+        "count": 24,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-03-01T00:00:00",
+        "a3": "Boeng Tumpun 1",
+        "count": 16,
+        "status": "Closed"
+    },
+    {
+        "month": "2025-03-01T00:00:00",
+        "a3": "Boeng Tumpun 2",
+        "count": 10,
+        "status": "Closed"
+    }
+],
+      dataset2: [
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 1979,
+        "est_count": 2
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 1980,
+        "est_count": 2
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 1984,
+        "est_count": 1
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 1987,
+        "est_count": 1
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 1988,
+        "est_count": 1
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 1990,
+        "est_count": 4
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 1993,
+        "est_count": 2
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 1994,
+        "est_count": 1
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 1995,
+        "est_count": 10
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 1996,
+        "est_count": 4
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 1997,
+        "est_count": 3
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 1998,
+        "est_count": 4
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 1999,
+        "est_count": 3
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2000,
+        "est_count": 19
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2002,
+        "est_count": 1
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2003,
+        "est_count": 5
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2004,
+        "est_count": 3
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2005,
+        "est_count": 25
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2006,
+        "est_count": 3
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2007,
+        "est_count": 6
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2008,
+        "est_count": 9
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2009,
+        "est_count": 8
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2010,
+        "est_count": 28
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2011,
+        "est_count": 6
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2012,
+        "est_count": 15
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2013,
+        "est_count": 19
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2014,
+        "est_count": 24
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2015,
+        "est_count": 84
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2016,
+        "est_count": 31
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2017,
+        "est_count": 46
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2018,
+        "est_count": 45
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2019,
+        "est_count": 96
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2020,
+        "est_count": 94
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2021,
+        "est_count": 71
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2022,
+        "est_count": 112
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2023,
+        "est_count": 182
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2024,
+        "est_count": 149
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "year": 2025,
+        "est_count": 108
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 1984,
+        "est_count": 1
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 1985,
+        "est_count": 2
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 1987,
+        "est_count": 1
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 1988,
+        "est_count": 2
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 1989,
+        "est_count": 1
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 1990,
+        "est_count": 1
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 1992,
+        "est_count": 2
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 1993,
+        "est_count": 3
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 1994,
+        "est_count": 1
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 1995,
+        "est_count": 5
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 1996,
+        "est_count": 1
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 1997,
+        "est_count": 2
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 1998,
+        "est_count": 1
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 1999,
+        "est_count": 2
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2000,
+        "est_count": 13
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2001,
+        "est_count": 5
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2002,
+        "est_count": 7
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2003,
+        "est_count": 5
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2004,
+        "est_count": 9
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2005,
+        "est_count": 20
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2006,
+        "est_count": 3
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2007,
+        "est_count": 12
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2008,
+        "est_count": 10
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2009,
+        "est_count": 5
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2010,
+        "est_count": 25
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2011,
+        "est_count": 12
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2012,
+        "est_count": 16
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2013,
+        "est_count": 30
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2014,
+        "est_count": 36
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2015,
+        "est_count": 75
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2016,
+        "est_count": 43
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2017,
+        "est_count": 53
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2018,
+        "est_count": 82
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2019,
+        "est_count": 81
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2020,
+        "est_count": 116
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2021,
+        "est_count": 88
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2022,
+        "est_count": 164
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2023,
+        "est_count": 204
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2024,
+        "est_count": 167
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "year": 2025,
+        "est_count": 155
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 1978,
+        "est_count": 1
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 1984,
+        "est_count": 1
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 1989,
+        "est_count": 1
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 1990,
+        "est_count": 1
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 1991,
+        "est_count": 1
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 1994,
+        "est_count": 1
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 1995,
+        "est_count": 3
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 1996,
+        "est_count": 3
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 1997,
+        "est_count": 1
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 1998,
+        "est_count": 3
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2000,
+        "est_count": 23
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2001,
+        "est_count": 2
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2002,
+        "est_count": 7
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2003,
+        "est_count": 6
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2004,
+        "est_count": 7
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2005,
+        "est_count": 58
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2006,
+        "est_count": 5
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2007,
+        "est_count": 14
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2008,
+        "est_count": 11
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2009,
+        "est_count": 9
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2010,
+        "est_count": 55
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2011,
+        "est_count": 8
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2012,
+        "est_count": 34
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2013,
+        "est_count": 41
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2014,
+        "est_count": 38
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2015,
+        "est_count": 159
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2016,
+        "est_count": 54
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2017,
+        "est_count": 81
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2018,
+        "est_count": 136
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2019,
+        "est_count": 152
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2020,
+        "est_count": 184
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2021,
+        "est_count": 138
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2022,
+        "est_count": 198
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2023,
+        "est_count": 293
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2024,
+        "est_count": 301
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "year": 2025,
+        "est_count": 274
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 1980,
+        "est_count": 1
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 1984,
+        "est_count": 1
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 1989,
+        "est_count": 1
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 1990,
+        "est_count": 3
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 1991,
+        "est_count": 1
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 1992,
+        "est_count": 1
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 1995,
+        "est_count": 2
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 1997,
+        "est_count": 1
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 1998,
+        "est_count": 6
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 1999,
+        "est_count": 4
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2000,
+        "est_count": 24
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2001,
+        "est_count": 4
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2002,
+        "est_count": 7
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2003,
+        "est_count": 14
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2004,
+        "est_count": 8
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2005,
+        "est_count": 39
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2006,
+        "est_count": 11
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2007,
+        "est_count": 10
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2008,
+        "est_count": 10
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2009,
+        "est_count": 15
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2010,
+        "est_count": 48
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2011,
+        "est_count": 22
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2012,
+        "est_count": 47
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2013,
+        "est_count": 48
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2014,
+        "est_count": 62
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2015,
+        "est_count": 179
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2016,
+        "est_count": 82
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2017,
+        "est_count": 123
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2018,
+        "est_count": 153
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2019,
+        "est_count": 167
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2020,
+        "est_count": 189
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2021,
+        "est_count": 179
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2022,
+        "est_count": 268
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2023,
+        "est_count": 405
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2024,
+        "est_count": 340
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "year": 2025,
+        "est_count": 280
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 1986,
+        "est_count": 1
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 1995,
+        "est_count": 2
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 1996,
+        "est_count": 2
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 1997,
+        "est_count": 2
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 1998,
+        "est_count": 2
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 1999,
+        "est_count": 2
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2000,
+        "est_count": 26
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2001,
+        "est_count": 3
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2002,
+        "est_count": 3
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2003,
+        "est_count": 6
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2004,
+        "est_count": 8
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2005,
+        "est_count": 63
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2006,
+        "est_count": 13
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2007,
+        "est_count": 16
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2008,
+        "est_count": 28
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2009,
+        "est_count": 15
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2010,
+        "est_count": 74
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2011,
+        "est_count": 39
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2012,
+        "est_count": 69
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2013,
+        "est_count": 78
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2014,
+        "est_count": 78
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2015,
+        "est_count": 205
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2016,
+        "est_count": 109
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2017,
+        "est_count": 165
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2018,
+        "est_count": 209
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2019,
+        "est_count": 206
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2020,
+        "est_count": 236
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2021,
+        "est_count": 224
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2022,
+        "est_count": 338
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2023,
+        "est_count": 465
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2024,
+        "est_count": 385
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "year": 2025,
+        "est_count": 303
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 1978,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 1985,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 1988,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 1989,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 1990,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 1991,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 1993,
+        "est_count": 4
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 1994,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 1995,
+        "est_count": 5
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 1996,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 1997,
+        "est_count": 9
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 1998,
+        "est_count": 3
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 1999,
+        "est_count": 7
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2000,
+        "est_count": 8
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2001,
+        "est_count": 2
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2002,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2003,
+        "est_count": 5
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2004,
+        "est_count": 4
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2005,
+        "est_count": 24
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2006,
+        "est_count": 6
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2007,
+        "est_count": 6
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2008,
+        "est_count": 11
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2009,
+        "est_count": 5
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2010,
+        "est_count": 30
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2011,
+        "est_count": 12
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2012,
+        "est_count": 43
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2013,
+        "est_count": 28
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2014,
+        "est_count": 45
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2015,
+        "est_count": 126
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2016,
+        "est_count": 45
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2017,
+        "est_count": 96
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2018,
+        "est_count": 101
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2019,
+        "est_count": 102
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2020,
+        "est_count": 155
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2021,
+        "est_count": 118
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2022,
+        "est_count": 164
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2023,
+        "est_count": 214
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2024,
+        "est_count": 243
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "year": 2025,
+        "est_count": 189
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 1984,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 1985,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 1987,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 1988,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 1989,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 1990,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 1991,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 1992,
+        "est_count": 2
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 1993,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 1994,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 1996,
+        "est_count": 2
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 1997,
+        "est_count": 2
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 1999,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2000,
+        "est_count": 15
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2001,
+        "est_count": 1
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2002,
+        "est_count": 2
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2003,
+        "est_count": 4
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2004,
+        "est_count": 5
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2005,
+        "est_count": 23
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2006,
+        "est_count": 6
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2007,
+        "est_count": 8
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2008,
+        "est_count": 7
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2009,
+        "est_count": 7
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2010,
+        "est_count": 26
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2011,
+        "est_count": 16
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2012,
+        "est_count": 18
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2013,
+        "est_count": 30
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2014,
+        "est_count": 40
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2015,
+        "est_count": 110
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2016,
+        "est_count": 50
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2017,
+        "est_count": 78
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2018,
+        "est_count": 118
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2019,
+        "est_count": 120
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2020,
+        "est_count": 136
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2021,
+        "est_count": 105
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2022,
+        "est_count": 173
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2023,
+        "est_count": 238
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2024,
+        "est_count": 239
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "year": 2025,
+        "est_count": 154
+    }
+],
+      dataset3: [
+    {
+        "a3": "Chak Angrae Leu",
+        "status": "Closed Establishments",
+        "count": 37,
+        "percentage": 2.9,
+        "label": "37 (2.9%)"
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "status": "Operating Establishments",
+        "count": 1238,
+        "percentage": 97.1,
+        "label": "1238 (97.1%)"
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "status": "Closed Establishments",
+        "count": 68,
+        "percentage": 4.4,
+        "label": "68 (4.4%)"
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "status": "Operating Establishments",
+        "count": 1466,
+        "percentage": 95.6,
+        "label": "1466 (95.6%)"
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "status": "Closed Establishments",
+        "count": 63,
+        "percentage": 2.6,
+        "label": "63 (2.6%)"
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "status": "Operating Establishments",
+        "count": 2317,
+        "percentage": 97.4,
+        "label": "2317 (97.4%)"
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "status": "Closed Establishments",
+        "count": 51,
+        "percentage": 1.8,
+        "label": "51 (1.8%)"
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "status": "Operating Establishments",
+        "count": 2797,
+        "percentage": 98.2,
+        "label": "2797 (98.2%)"
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "status": "Closed Establishments",
+        "count": 109,
+        "percentage": 3.1,
+        "label": "109 (3.1%)"
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "status": "Operating Establishments",
+        "count": 3392,
+        "percentage": 96.9,
+        "label": "3392 (96.9%)"
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "status": "Closed Establishments",
+        "count": 92,
+        "percentage": 4.8,
+        "label": "92 (4.8%)"
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "status": "Operating Establishments",
+        "count": 1839,
+        "percentage": 95.2,
+        "label": "1839 (95.2%)"
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "status": "Closed Establishments",
+        "count": 60,
+        "percentage": 3.3,
+        "label": "60 (3.3%)"
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "status": "Operating Establishments",
+        "count": 1771,
+        "percentage": 96.7,
+        "label": "1771 (96.7%)"
+    }
+],
+      dataset4: [
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Accommodation and food services activities",
+        "count": 330,
+        "status": "Opened",
+        "total_type": 3846,
+        "percent": 26.67744543249798
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Wholesale and retail trade",
+        "count": 462,
+        "status": "Opened",
+        "total_type": 6062,
+        "percent": 37.34842360549717
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Repair of motor vehicles and motorcycles",
+        "count": 43,
+        "status": "Opened",
+        "total_type": 655,
+        "percent": 3.476151980598222
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Manufacturing",
+        "count": 99,
+        "status": "Opened",
+        "total_type": 1599,
+        "percent": 8.003233629749394
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Electricity, gas, steam and air conditioning supply",
+        "count": 18,
+        "status": "Opened",
+        "total_type": 120,
+        "percent": 1.455133387227162
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Construction",
+        "count": 27,
+        "status": "Opened",
+        "total_type": 125,
+        "percent": 2.182700080840744
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Transportation and storage",
+        "count": 7,
+        "status": "Opened",
+        "total_type": 142,
+        "percent": 0.5658852061438965
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Information and communication",
+        "count": 5,
+        "status": "Opened",
+        "total_type": 23,
+        "percent": 0.4042037186742118
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Financial and insurance activities",
+        "count": 16,
+        "status": "Opened",
+        "total_type": 221,
+        "percent": 1.293451899757478
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Bank and insurance companies",
+        "count": 4,
+        "status": "Opened",
+        "total_type": 56,
+        "percent": 0.3233629749393694
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Real estate activities",
+        "count": 39,
+        "status": "Opened",
+        "total_type": 587,
+        "percent": 3.152789005658852
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Professional, scientific and technical",
+        "count": 13,
+        "status": "Opened",
+        "total_type": 150,
+        "percent": 1.050929668552951
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Administrative and support service",
+        "count": 9,
+        "status": "Opened",
+        "total_type": 106,
+        "percent": 0.7275666936135812
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Public administration and defense",
+        "count": 2,
+        "status": "Opened",
+        "total_type": 16,
+        "percent": 0.1616814874696847
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Public education",
+        "count": 3,
+        "status": "Opened",
+        "total_type": 13,
+        "percent": 0.2425222312045271
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Private education",
+        "count": 2,
+        "status": "Opened",
+        "total_type": 155,
+        "percent": 0.1616814874696847
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Human health and social work activity",
+        "count": 42,
+        "status": "Opened",
+        "total_type": 467,
+        "percent": 3.395311236863379
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Art, entertainment and recreation",
+        "count": 9,
+        "status": "Opened",
+        "total_type": 106,
+        "percent": 0.7275666936135812
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Other service activities",
+        "count": 105,
+        "status": "Opened",
+        "total_type": 1403,
+        "percent": 8.488278092158447
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Activities of extraterritorial organizations",
+        "count": 2,
+        "status": "Opened",
+        "total_type": 73,
+        "percent": 0.1616814874696847
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Accommodation and food services activities",
+        "count": 319,
+        "status": "Opened",
+        "total_type": 3846,
+        "percent": 21.75989085948158
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Wholesale and retail trade",
+        "count": 613,
+        "status": "Opened",
+        "total_type": 6062,
+        "percent": 41.81446111869032
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Repair of motor vehicles and motorcycles",
+        "count": 60,
+        "status": "Opened",
+        "total_type": 655,
+        "percent": 4.092769440654844
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Agriculture, forestry and fishing",
+        "count": 2,
+        "status": "Opened",
+        "total_type": 12,
+        "percent": 0.1364256480218281
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Manufacturing",
+        "count": 133,
+        "status": "Opened",
+        "total_type": 1599,
+        "percent": 9.072305593451569
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Electricity, gas, steam and air conditioning supply",
+        "count": 15,
+        "status": "Opened",
+        "total_type": 120,
+        "percent": 1.023192360163711
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Construction",
+        "count": 22,
+        "status": "Opened",
+        "total_type": 125,
+        "percent": 1.500682128240109
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Transportation and storage",
+        "count": 11,
+        "status": "Opened",
+        "total_type": 142,
+        "percent": 0.7503410641200546
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Information and communication",
+        "count": 7,
+        "status": "Opened",
+        "total_type": 23,
+        "percent": 0.4774897680763984
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Financial and insurance activities",
+        "count": 24,
+        "status": "Opened",
+        "total_type": 221,
+        "percent": 1.637107776261937
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Bank and insurance companies",
+        "count": 2,
+        "status": "Opened",
+        "total_type": 56,
+        "percent": 0.1364256480218281
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Real estate activities",
+        "count": 12,
+        "status": "Opened",
+        "total_type": 587,
+        "percent": 0.8185538881309686
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Professional, scientific and technical",
+        "count": 20,
+        "status": "Opened",
+        "total_type": 150,
+        "percent": 1.364256480218281
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Administrative and support service",
+        "count": 11,
+        "status": "Opened",
+        "total_type": 106,
+        "percent": 0.7503410641200546
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Public administration and defense",
+        "count": 3,
+        "status": "Opened",
+        "total_type": 16,
+        "percent": 0.2046384720327422
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Public education",
+        "count": 1,
+        "status": "Opened",
+        "total_type": 13,
+        "percent": 0.06821282401091405
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Private education",
+        "count": 22,
+        "status": "Opened",
+        "total_type": 155,
+        "percent": 1.500682128240109
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Human health and social work activity",
+        "count": 50,
+        "status": "Opened",
+        "total_type": 467,
+        "percent": 3.410641200545703
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Art, entertainment and recreation",
+        "count": 8,
+        "status": "Opened",
+        "total_type": 106,
+        "percent": 0.5457025920873124
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Other service activities",
+        "count": 130,
+        "status": "Opened",
+        "total_type": 1403,
+        "percent": 8.867667121418826
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Activities of extraterritorial organizations",
+        "count": 1,
+        "status": "Opened",
+        "total_type": 73,
+        "percent": 0.06821282401091405
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Accommodation and food services activities",
+        "count": 632,
+        "status": "Opened",
+        "total_type": 3846,
+        "percent": 27.33564013840831
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Wholesale and retail trade",
+        "count": 806,
+        "status": "Opened",
+        "total_type": 6062,
+        "percent": 34.86159169550173
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Repair of motor vehicles and motorcycles",
+        "count": 100,
+        "status": "Opened",
+        "total_type": 655,
+        "percent": 4.325259515570934
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Agriculture, forestry and fishing",
+        "count": 5,
+        "status": "Opened",
+        "total_type": 12,
+        "percent": 0.2162629757785467
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Manufacturing",
+        "count": 269,
+        "status": "Opened",
+        "total_type": 1599,
+        "percent": 11.63494809688581
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Electricity, gas, steam and air conditioning supply",
+        "count": 14,
+        "status": "Opened",
+        "total_type": 120,
+        "percent": 0.6055363321799307
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Construction",
+        "count": 13,
+        "status": "Opened",
+        "total_type": 125,
+        "percent": 0.5622837370242215
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Transportation and storage",
+        "count": 15,
+        "status": "Opened",
+        "total_type": 142,
+        "percent": 0.6487889273356401
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Information and communication",
+        "count": 5,
+        "status": "Opened",
+        "total_type": 23,
+        "percent": 0.2162629757785467
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Financial and insurance activities",
+        "count": 35,
+        "status": "Opened",
+        "total_type": 221,
+        "percent": 1.513840830449827
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Bank and insurance companies",
+        "count": 12,
+        "status": "Opened",
+        "total_type": 56,
+        "percent": 0.5190311418685121
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Real estate activities",
+        "count": 53,
+        "status": "Opened",
+        "total_type": 587,
+        "percent": 2.292387543252595
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Professional, scientific and technical",
+        "count": 19,
+        "status": "Opened",
+        "total_type": 150,
+        "percent": 0.8217993079584774
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Administrative and support service",
+        "count": 8,
+        "status": "Opened",
+        "total_type": 106,
+        "percent": 0.3460207612456748
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Public administration and defense",
+        "count": 2,
+        "status": "Opened",
+        "total_type": 16,
+        "percent": 0.08650519031141869
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Public education",
+        "count": 2,
+        "status": "Opened",
+        "total_type": 13,
+        "percent": 0.08650519031141869
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Private education",
+        "count": 28,
+        "status": "Opened",
+        "total_type": 155,
+        "percent": 1.211072664359861
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Human health and social work activity",
+        "count": 71,
+        "status": "Opened",
+        "total_type": 467,
+        "percent": 3.070934256055363
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Art, entertainment and recreation",
+        "count": 14,
+        "status": "Opened",
+        "total_type": 106,
+        "percent": 0.6055363321799307
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Other service activities",
+        "count": 206,
+        "status": "Opened",
+        "total_type": 1403,
+        "percent": 8.910034602076125
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Activities of extraterritorial organizations",
+        "count": 3,
+        "status": "Opened",
+        "total_type": 73,
+        "percent": 0.129757785467128
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Accommodation and food services activities",
+        "count": 670,
+        "status": "Opened",
+        "total_type": 3846,
+        "percent": 23.95423668215946
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Wholesale and retail trade",
+        "count": 1125,
+        "status": "Opened",
+        "total_type": 6062,
+        "percent": 40.22166607079013
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Repair of motor vehicles and motorcycles",
+        "count": 96,
+        "status": "Opened",
+        "total_type": 655,
+        "percent": 3.432248838040758
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Agriculture, forestry and fishing",
+        "count": 1,
+        "status": "Opened",
+        "total_type": 12,
+        "percent": 0.03575259206292456
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Manufacturing",
+        "count": 315,
+        "status": "Opened",
+        "total_type": 1599,
+        "percent": 11.26206649982124
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Electricity, gas, steam and air conditioning supply",
+        "count": 25,
+        "status": "Opened",
+        "total_type": 120,
+        "percent": 0.893814801573114
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Construction",
+        "count": 8,
+        "status": "Opened",
+        "total_type": 125,
+        "percent": 0.2860207365033965
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Transportation and storage",
+        "count": 41,
+        "status": "Opened",
+        "total_type": 142,
+        "percent": 1.465856274579907
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Information and communication",
+        "count": 1,
+        "status": "Opened",
+        "total_type": 23,
+        "percent": 0.03575259206292456
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Financial and insurance activities",
+        "count": 32,
+        "status": "Opened",
+        "total_type": 221,
+        "percent": 1.144082946013586
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Bank and insurance companies",
+        "count": 16,
+        "status": "Opened",
+        "total_type": 56,
+        "percent": 0.572041473006793
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Real estate activities",
+        "count": 84,
+        "status": "Opened",
+        "total_type": 587,
+        "percent": 3.003217733285663
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Professional, scientific and technical",
+        "count": 8,
+        "status": "Opened",
+        "total_type": 150,
+        "percent": 0.2860207365033965
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Administrative and support service",
+        "count": 21,
+        "status": "Opened",
+        "total_type": 106,
+        "percent": 0.7508044333214158
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Public administration and defense",
+        "count": 3,
+        "status": "Opened",
+        "total_type": 16,
+        "percent": 0.1072577761887737
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Public education",
+        "count": 2,
+        "status": "Opened",
+        "total_type": 13,
+        "percent": 0.07150518412584912
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Private education",
+        "count": 24,
+        "status": "Opened",
+        "total_type": 155,
+        "percent": 0.8580622095101895
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Human health and social work activity",
+        "count": 66,
+        "status": "Opened",
+        "total_type": 467,
+        "percent": 2.359671076153021
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Art, entertainment and recreation",
+        "count": 19,
+        "status": "Opened",
+        "total_type": 106,
+        "percent": 0.6792992491955666
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Other service activities",
+        "count": 219,
+        "status": "Opened",
+        "total_type": 1403,
+        "percent": 7.829817661780479
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Activities of households as employers",
+        "count": 1,
+        "status": "Opened",
+        "total_type": 2,
+        "percent": 0.03575259206292456
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Activities of extraterritorial organizations",
+        "count": 20,
+        "status": "Opened",
+        "total_type": 73,
+        "percent": 0.7150518412584912
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Accommodation and food services activities",
+        "count": 560,
+        "status": "Opened",
+        "total_type": 3846,
+        "percent": 16.51917404129793
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Wholesale and retail trade",
+        "count": 1387,
+        "status": "Opened",
+        "total_type": 6062,
+        "percent": 40.91445427728613
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Repair of motor vehicles and motorcycles",
+        "count": 161,
+        "status": "Opened",
+        "total_type": 655,
+        "percent": 4.749262536873156
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Manufacturing",
+        "count": 271,
+        "status": "Opened",
+        "total_type": 1599,
+        "percent": 7.994100294985252
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Electricity, gas, steam and air conditioning supply",
+        "count": 24,
+        "status": "Opened",
+        "total_type": 120,
+        "percent": 0.7079646017699115
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Construction",
+        "count": 30,
+        "status": "Opened",
+        "total_type": 125,
+        "percent": 0.8849557522123894
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Transportation and storage",
+        "count": 42,
+        "status": "Opened",
+        "total_type": 142,
+        "percent": 1.238938053097345
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Information and communication",
+        "count": 1,
+        "status": "Opened",
+        "total_type": 23,
+        "percent": 0.02949852507374631
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Financial and insurance activities",
+        "count": 53,
+        "status": "Opened",
+        "total_type": 221,
+        "percent": 1.563421828908555
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Bank and insurance companies",
+        "count": 9,
+        "status": "Opened",
+        "total_type": 56,
+        "percent": 0.2654867256637168
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Real estate activities",
+        "count": 363,
+        "status": "Opened",
+        "total_type": 587,
+        "percent": 10.70796460176991
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Professional, scientific and technical",
+        "count": 20,
+        "status": "Opened",
+        "total_type": 150,
+        "percent": 0.5899705014749262
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Administrative and support service",
+        "count": 25,
+        "status": "Opened",
+        "total_type": 106,
+        "percent": 0.7374631268436578
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Public administration and defense",
+        "count": 3,
+        "status": "Opened",
+        "total_type": 16,
+        "percent": 0.08849557522123894
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Public education",
+        "count": 2,
+        "status": "Opened",
+        "total_type": 13,
+        "percent": 0.05899705014749262
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Private education",
+        "count": 31,
+        "status": "Opened",
+        "total_type": 155,
+        "percent": 0.9144542772861357
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Human health and social work activity",
+        "count": 100,
+        "status": "Opened",
+        "total_type": 467,
+        "percent": 2.949852507374631
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Art, entertainment and recreation",
+        "count": 21,
+        "status": "Opened",
+        "total_type": 106,
+        "percent": 0.6194690265486725
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Other service activities",
+        "count": 281,
+        "status": "Opened",
+        "total_type": 1403,
+        "percent": 8.289085545722715
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Activities of extraterritorial organizations",
+        "count": 6,
+        "status": "Opened",
+        "total_type": 73,
+        "percent": 0.1769911504424779
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Accommodation and food services activities",
+        "count": 495,
+        "status": "Opened",
+        "total_type": 3846,
+        "percent": 26.93144722524483
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Wholesale and retail trade",
+        "count": 676,
+        "status": "Opened",
+        "total_type": 6062,
+        "percent": 36.7791077257889
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Repair of motor vehicles and motorcycles",
+        "count": 83,
+        "status": "Opened",
+        "total_type": 655,
+        "percent": 4.515778019586507
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Agriculture, forestry and fishing",
+        "count": 2,
+        "status": "Opened",
+        "total_type": 12,
+        "percent": 0.1088139281828074
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Manufacturing",
+        "count": 206,
+        "status": "Opened",
+        "total_type": 1599,
+        "percent": 11.20783460282916
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Electricity, gas, steam and air conditioning supply",
+        "count": 11,
+        "status": "Opened",
+        "total_type": 120,
+        "percent": 0.5984766050054406
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Construction",
+        "count": 9,
+        "status": "Opened",
+        "total_type": 125,
+        "percent": 0.4896626768226333
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Transportation and storage",
+        "count": 8,
+        "status": "Opened",
+        "total_type": 142,
+        "percent": 0.4352557127312296
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Information and communication",
+        "count": 1,
+        "status": "Opened",
+        "total_type": 23,
+        "percent": 0.0544069640914037
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Financial and insurance activities",
+        "count": 29,
+        "status": "Opened",
+        "total_type": 221,
+        "percent": 1.577801958650707
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Bank and insurance companies",
+        "count": 6,
+        "status": "Opened",
+        "total_type": 56,
+        "percent": 0.3264417845484222
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Real estate activities",
+        "count": 13,
+        "status": "Opened",
+        "total_type": 587,
+        "percent": 0.7072905331882481
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Professional, scientific and technical",
+        "count": 24,
+        "status": "Opened",
+        "total_type": 150,
+        "percent": 1.305767138193689
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Administrative and support service",
+        "count": 14,
+        "status": "Opened",
+        "total_type": 106,
+        "percent": 0.7616974972796519
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Public education",
+        "count": 2,
+        "status": "Opened",
+        "total_type": 13,
+        "percent": 0.1088139281828074
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Private education",
+        "count": 22,
+        "status": "Opened",
+        "total_type": 155,
+        "percent": 1.196953210010881
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Human health and social work activity",
+        "count": 57,
+        "status": "Opened",
+        "total_type": 467,
+        "percent": 3.101196953210011
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Art, entertainment and recreation",
+        "count": 11,
+        "status": "Opened",
+        "total_type": 106,
+        "percent": 0.5984766050054406
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Other service activities",
+        "count": 150,
+        "status": "Opened",
+        "total_type": 1403,
+        "percent": 8.161044613710555
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Activities of extraterritorial organizations",
+        "count": 19,
+        "status": "Opened",
+        "total_type": 73,
+        "percent": 1.03373231773667
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Accommodation and food services activities",
+        "count": 531,
+        "status": "Opened",
+        "total_type": 3846,
+        "percent": 29.98306041784303
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Wholesale and retail trade",
+        "count": 631,
+        "status": "Opened",
+        "total_type": 6062,
+        "percent": 35.62958780350085
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Repair of motor vehicles and motorcycles",
+        "count": 54,
+        "status": "Opened",
+        "total_type": 655,
+        "percent": 3.049124788255223
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Agriculture, forestry and fishing",
+        "count": 2,
+        "status": "Opened",
+        "total_type": 12,
+        "percent": 0.1129305477131564
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Mining and quarrying",
+        "count": 1,
+        "status": "Opened",
+        "total_type": 2,
+        "percent": 0.0564652738565782
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Manufacturing",
+        "count": 205,
+        "status": "Opened",
+        "total_type": 1599,
+        "percent": 11.57538114059853
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Electricity, gas, steam and air conditioning supply",
+        "count": 12,
+        "status": "Opened",
+        "total_type": 120,
+        "percent": 0.6775832862789385
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Construction",
+        "count": 9,
+        "status": "Opened",
+        "total_type": 125,
+        "percent": 0.5081874647092038
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Transportation and storage",
+        "count": 8,
+        "status": "Opened",
+        "total_type": 142,
+        "percent": 0.4517221908526256
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Information and communication",
+        "count": 1,
+        "status": "Opened",
+        "total_type": 23,
+        "percent": 0.0564652738565782
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Financial and insurance activities",
+        "count": 22,
+        "status": "Opened",
+        "total_type": 221,
+        "percent": 1.24223602484472
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Bank and insurance companies",
+        "count": 5,
+        "status": "Opened",
+        "total_type": 56,
+        "percent": 0.282326369282891
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Real estate activities",
+        "count": 21,
+        "status": "Opened",
+        "total_type": 587,
+        "percent": 1.185770750988142
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Professional, scientific and technical",
+        "count": 8,
+        "status": "Opened",
+        "total_type": 150,
+        "percent": 0.4517221908526256
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Administrative and support service",
+        "count": 15,
+        "status": "Opened",
+        "total_type": 106,
+        "percent": 0.846979107848673
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Public administration and defense",
+        "count": 1,
+        "status": "Opened",
+        "total_type": 16,
+        "percent": 0.0564652738565782
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Public education",
+        "count": 1,
+        "status": "Opened",
+        "total_type": 13,
+        "percent": 0.0564652738565782
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Private education",
+        "count": 20,
+        "status": "Opened",
+        "total_type": 155,
+        "percent": 1.129305477131564
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Human health and social work activity",
+        "count": 52,
+        "status": "Opened",
+        "total_type": 467,
+        "percent": 2.936194240542067
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Art, entertainment and recreation",
+        "count": 15,
+        "status": "Opened",
+        "total_type": 106,
+        "percent": 0.846979107848673
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Other service activities",
+        "count": 137,
+        "status": "Opened",
+        "total_type": 1403,
+        "percent": 7.735742518351215
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Activities of extraterritorial organizations",
+        "count": 20,
+        "status": "Opened",
+        "total_type": 73,
+        "percent": 1.129305477131564
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Accommodation and food services activities",
+        "count": 20,
+        "status": "Closed",
+        "total_type": 3846,
+        "percent": 30.3030303030303
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Wholesale and retail trade",
+        "count": 17,
+        "status": "Closed",
+        "total_type": 6062,
+        "percent": 25.75757575757576
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Repair of motor vehicles and motorcycles",
+        "count": 4,
+        "status": "Closed",
+        "total_type": 655,
+        "percent": 6.060606060606061
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Manufacturing",
+        "count": 4,
+        "status": "Closed",
+        "total_type": 1599,
+        "percent": 6.060606060606061
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Construction",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 125,
+        "percent": 1.515151515151515
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Information and communication",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 23,
+        "percent": 1.515151515151515
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Professional, scientific and technical",
+        "count": 2,
+        "status": "Closed",
+        "total_type": 150,
+        "percent": 3.03030303030303
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Administrative and support service",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 106,
+        "percent": 1.515151515151515
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Human health and social work activity",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 467,
+        "percent": 1.515151515151515
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Art, entertainment and recreation",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 106,
+        "percent": 1.515151515151515
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Other service activities",
+        "count": 13,
+        "status": "Closed",
+        "total_type": 1403,
+        "percent": 19.6969696969697
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "type": "Activities of households as employers",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 2,
+        "percent": 1.515151515151515
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Accommodation and food services activities",
+        "count": 38,
+        "status": "Closed",
+        "total_type": 3846,
+        "percent": 33.04347826086956
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Wholesale and retail trade",
+        "count": 35,
+        "status": "Closed",
+        "total_type": 6062,
+        "percent": 30.43478260869566
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Repair of motor vehicles and motorcycles",
+        "count": 4,
+        "status": "Closed",
+        "total_type": 655,
+        "percent": 3.478260869565217
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Manufacturing",
+        "count": 8,
+        "status": "Closed",
+        "total_type": 1599,
+        "percent": 6.956521739130435
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Construction",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 125,
+        "percent": 0.8695652173913043
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Real estate activities",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 587,
+        "percent": 0.8695652173913043
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Professional, scientific and technical",
+        "count": 4,
+        "status": "Closed",
+        "total_type": 150,
+        "percent": 3.478260869565217
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Public administration and defense",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 16,
+        "percent": 0.8695652173913043
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Private education",
+        "count": 3,
+        "status": "Closed",
+        "total_type": 155,
+        "percent": 2.608695652173913
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Human health and social work activity",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 467,
+        "percent": 0.8695652173913043
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Art, entertainment and recreation",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 106,
+        "percent": 0.8695652173913043
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "type": "Other service activities",
+        "count": 18,
+        "status": "Closed",
+        "total_type": 1403,
+        "percent": 15.65217391304348
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Accommodation and food services activities",
+        "count": 53,
+        "status": "Closed",
+        "total_type": 3846,
+        "percent": 25.60386473429952
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Wholesale and retail trade",
+        "count": 80,
+        "status": "Closed",
+        "total_type": 6062,
+        "percent": 38.64734299516908
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Repair of motor vehicles and motorcycles",
+        "count": 10,
+        "status": "Closed",
+        "total_type": 655,
+        "percent": 4.830917874396135
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Manufacturing",
+        "count": 18,
+        "status": "Closed",
+        "total_type": 1599,
+        "percent": 8.695652173913043
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Construction",
+        "count": 3,
+        "status": "Closed",
+        "total_type": 125,
+        "percent": 1.449275362318841
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Information and communication",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 23,
+        "percent": 0.4830917874396135
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Professional, scientific and technical",
+        "count": 4,
+        "status": "Closed",
+        "total_type": 150,
+        "percent": 1.932367149758454
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Administrative and support service",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 106,
+        "percent": 0.4830917874396135
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Private education",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 155,
+        "percent": 0.4830917874396135
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Human health and social work activity",
+        "count": 4,
+        "status": "Closed",
+        "total_type": 467,
+        "percent": 1.932367149758454
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Art, entertainment and recreation",
+        "count": 2,
+        "status": "Closed",
+        "total_type": 106,
+        "percent": 0.966183574879227
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "type": "Other service activities",
+        "count": 30,
+        "status": "Closed",
+        "total_type": 1403,
+        "percent": 14.49275362318841
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Accommodation and food services activities",
+        "count": 48,
+        "status": "Closed",
+        "total_type": 3846,
+        "percent": 28.07017543859649
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Wholesale and retail trade",
+        "count": 59,
+        "status": "Closed",
+        "total_type": 6062,
+        "percent": 34.50292397660819
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Repair of motor vehicles and motorcycles",
+        "count": 8,
+        "status": "Closed",
+        "total_type": 655,
+        "percent": 4.678362573099415
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Manufacturing",
+        "count": 14,
+        "status": "Closed",
+        "total_type": 1599,
+        "percent": 8.187134502923977
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Transportation and storage",
+        "count": 6,
+        "status": "Closed",
+        "total_type": 142,
+        "percent": 3.508771929824561
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Financial and insurance activities",
+        "count": 2,
+        "status": "Closed",
+        "total_type": 221,
+        "percent": 1.169590643274854
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Bank and insurance companies",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 56,
+        "percent": 0.5847953216374269
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Professional, scientific and technical",
+        "count": 2,
+        "status": "Closed",
+        "total_type": 150,
+        "percent": 1.169590643274854
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Public administration and defense",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 16,
+        "percent": 0.5847953216374269
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Human health and social work activity",
+        "count": 3,
+        "status": "Closed",
+        "total_type": 467,
+        "percent": 1.754385964912281
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Art, entertainment and recreation",
+        "count": 2,
+        "status": "Closed",
+        "total_type": 106,
+        "percent": 1.169590643274854
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "type": "Other service activities",
+        "count": 25,
+        "status": "Closed",
+        "total_type": 1403,
+        "percent": 14.61988304093567
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Accommodation and food services activities",
+        "count": 62,
+        "status": "Closed",
+        "total_type": 3846,
+        "percent": 22.14285714285714
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Wholesale and retail trade",
+        "count": 86,
+        "status": "Closed",
+        "total_type": 6062,
+        "percent": 30.71428571428572
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Repair of motor vehicles and motorcycles",
+        "count": 15,
+        "status": "Closed",
+        "total_type": 655,
+        "percent": 5.357142857142857
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Mining and quarrying",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 2,
+        "percent": 0.3571428571428572
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Manufacturing",
+        "count": 16,
+        "status": "Closed",
+        "total_type": 1599,
+        "percent": 5.714285714285714
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Construction",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 125,
+        "percent": 0.3571428571428572
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Transportation and storage",
+        "count": 3,
+        "status": "Closed",
+        "total_type": 142,
+        "percent": 1.071428571428571
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Financial and insurance activities",
+        "count": 5,
+        "status": "Closed",
+        "total_type": 221,
+        "percent": 1.785714285714286
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Real estate activities",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 587,
+        "percent": 0.3571428571428572
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Professional, scientific and technical",
+        "count": 11,
+        "status": "Closed",
+        "total_type": 150,
+        "percent": 3.928571428571428
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Private education",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 155,
+        "percent": 0.3571428571428572
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Human health and social work activity",
+        "count": 15,
+        "status": "Closed",
+        "total_type": 467,
+        "percent": 5.357142857142857
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Art, entertainment and recreation",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 106,
+        "percent": 0.3571428571428572
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Other service activities",
+        "count": 61,
+        "status": "Closed",
+        "total_type": 1403,
+        "percent": 21.78571428571428
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "type": "Activities of extraterritorial organizations",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 73,
+        "percent": 0.3571428571428572
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Accommodation and food services activities",
+        "count": 55,
+        "status": "Closed",
+        "total_type": 3846,
+        "percent": 31.79190751445087
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Wholesale and retail trade",
+        "count": 45,
+        "status": "Closed",
+        "total_type": 6062,
+        "percent": 26.01156069364162
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Repair of motor vehicles and motorcycles",
+        "count": 9,
+        "status": "Closed",
+        "total_type": 655,
+        "percent": 5.202312138728324
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Manufacturing",
+        "count": 24,
+        "status": "Closed",
+        "total_type": 1599,
+        "percent": 13.87283236994219
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Electricity, gas, steam and air conditioning supply",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 120,
+        "percent": 0.5780346820809248
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Transportation and storage",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 142,
+        "percent": 0.5780346820809248
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Financial and insurance activities",
+        "count": 2,
+        "status": "Closed",
+        "total_type": 221,
+        "percent": 1.15606936416185
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Bank and insurance companies",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 56,
+        "percent": 0.5780346820809248
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Professional, scientific and technical",
+        "count": 14,
+        "status": "Closed",
+        "total_type": 150,
+        "percent": 8.092485549132949
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Private education",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 155,
+        "percent": 0.5780346820809248
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Human health and social work activity",
+        "count": 3,
+        "status": "Closed",
+        "total_type": 467,
+        "percent": 1.734104046242774
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Art, entertainment and recreation",
+        "count": 2,
+        "status": "Closed",
+        "total_type": 106,
+        "percent": 1.15606936416185
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "type": "Other service activities",
+        "count": 15,
+        "status": "Closed",
+        "total_type": 1403,
+        "percent": 8.670520231213873
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Accommodation and food services activities",
+        "count": 33,
+        "status": "Closed",
+        "total_type": 3846,
+        "percent": 27.96610169491525
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Wholesale and retail trade",
+        "count": 40,
+        "status": "Closed",
+        "total_type": 6062,
+        "percent": 33.89830508474576
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Repair of motor vehicles and motorcycles",
+        "count": 8,
+        "status": "Closed",
+        "total_type": 655,
+        "percent": 6.779661016949152
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Manufacturing",
+        "count": 17,
+        "status": "Closed",
+        "total_type": 1599,
+        "percent": 14.40677966101695
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Construction",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 125,
+        "percent": 0.847457627118644
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Financial and insurance activities",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 221,
+        "percent": 0.847457627118644
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Professional, scientific and technical",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 150,
+        "percent": 0.847457627118644
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Administrative and support service",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 106,
+        "percent": 0.847457627118644
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Human health and social work activity",
+        "count": 2,
+        "status": "Closed",
+        "total_type": 467,
+        "percent": 1.694915254237288
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Other service activities",
+        "count": 13,
+        "status": "Closed",
+        "total_type": 1403,
+        "percent": 11.01694915254237
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "type": "Activities of extraterritorial organizations",
+        "count": 1,
+        "status": "Closed",
+        "total_type": 73,
+        "percent": 0.847457627118644
+    }
+],
+      dataset5: [
+    {
+        "a3": "Chak Angrae Leu",
+        "count": 1238
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "count": 1466
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "count": 2317
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "count": 2797
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "count": 3392
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "count": 1839
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "count": 1771
+    }
+],
+      dataset6: [
+    {
+        "a3": "Chak Angrae Leu",
+        "q7": "Not Registered",
+        "n": 790,
+        "percent": 72.34432234432234
+    },
+    {
+        "a3": "Chak Angrae Leu",
+        "q7": "Registered",
+        "n": 302,
+        "percent": 27.65567765567766
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "q7": "Not Registered",
+        "n": 962,
+        "percent": 77.76879547291836
+    },
+    {
+        "a3": "Chak Angrae Kraom",
+        "q7": "Registered",
+        "n": 275,
+        "percent": 22.23120452708165
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "q7": "Not Registered",
+        "n": 1748,
+        "percent": 83.71647509578544
+    },
+    {
+        "a3": "Stueng Mean Chey 1",
+        "q7": "Registered",
+        "n": 340,
+        "percent": 16.28352490421456
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "q7": "Not Registered",
+        "n": 2073,
+        "percent": 82.78753993610223
+    },
+    {
+        "a3": "Stueng Mean Chey 2",
+        "q7": "Registered",
+        "n": 431,
+        "percent": 17.21246006389777
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "q7": "Not Registered",
+        "n": 2412,
+        "percent": 80.99395567494963
+    },
+    {
+        "a3": "Stueng Mean Chey 3",
+        "q7": "Registered",
+        "n": 566,
+        "percent": 19.00604432505037
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "q7": "Not Registered",
+        "n": 1390,
+        "percent": 82.6888756692445
+    },
+    {
+        "a3": "Boeng Tumpun 1",
+        "q7": "Registered",
+        "n": 291,
+        "percent": 17.3111243307555
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "q7": "Not Registered",
+        "n": 1294,
+        "percent": 81.23038292529819
+    },
+    {
+        "a3": "Boeng Tumpun 2",
+        "q7": "Registered",
+        "n": 299,
+        "percent": 18.76961707470182
+    }
+],
+
+};
+
+    // Sangkat Geo Boundaries
+    const districtsGeoJSON = {
+      "type": "FeatureCollection",
+      "features": [
+        {"type":"Feature","properties":{"name":"Chak Angrae Kraom"},"geometry":{"type":"Polygon","coordinates":[[[104.93811,11.517273],[104.935913,11.526917],[104.932129,11.531311],[104.927124,11.530273],[104.924927,11.527893],[104.921509,11.525696],[104.920288,11.520691],[104.916321,11.518677],[104.912903,11.519104],[104.913696,11.514709],[104.913696,11.510315],[104.93811,11.517273]]]}},
+        {"type":"Feature","properties":{"name":"Chak Angrae Leu"},"geometry":{"type":"Polygon","coordinates":[[[104.913696,11.510315],[104.913879,11.505127],[104.912476,11.502319],[104.913696,11.482483],[104.921509,11.484497],[104.93573,11.489685],[104.947083,11.493713],[104.943726,11.499512],[104.942871,11.503113],[104.93811,11.517273],[104.913696,11.510315]]]}},
+        {"type":"Feature","properties":{"name":"Stueng Mean Chey 1"},"geometry":{"type":"Polygon","coordinates":[[[104.898071,11.548096],[104.895508,11.5495],[104.890076,11.55011],[104.886902,11.548706],[104.8851808,11.5485108],[104.8852855,11.5477355],[104.8841965,11.5471495],[104.8835688,11.5468105],[104.8829251,11.5343644],[104.8852855,11.5346587],[104.898071,11.548096]]]}},
+        {"type":"Feature","properties":{"name":"Stueng Mean Chey 2"},"geometry":{"type":"Polygon","coordinates":[[[104.8852855,11.5346587],[104.8858945,11.5344728],[104.8883085,11.5225203],[104.889099,11.522522],[104.893921,11.521912],[104.897705,11.522888],[104.897522,11.526306],[104.898499,11.533325],[104.898499,11.540283],[104.900696,11.544678],[104.898071,11.548096],[104.8852855,11.5346587]]]}},
+        {"type":"Feature","properties":{"name":"Stueng Mean Chey 3"},"geometry":{"type":"Polygon","coordinates":[[[104.8851808,11.5485108],[104.8812486,11.5480728],[104.877319,11.547485],[104.872314,11.547302],[104.864075,11.545715],[104.860718,11.545471],[104.861694,11.541504],[104.862915,11.524719],[104.868713,11.522095],[104.872314,11.522095],[104.876892,11.520508],[104.882507,11.522095],[104.8883085,11.5225203],[104.8858945,11.5344728],[104.8852855,11.5346587],[104.8829251,11.5343644],[104.8835688,11.5468105],[104.8852855,11.5477355],[104.8851808,11.5485108]]]}},
+        {"type":"Feature","properties":{"name":"Boeng Tumpun 1"},"geometry":{"type":"Polygon","coordinates":[[[104.897762,11.528044],[104.9113984,11.5273291],[104.915527,11.528931],[104.913879,11.533508],[104.911316,11.536499],[104.909302,11.54071],[104.905518,11.543518],[104.900696,11.544678],[104.898499,11.540283],[104.898499,11.533325],[104.897762,11.528044]]]}},
+        {"type":"Feature","properties":{"name":"Boeng Tumpun 2"},"geometry":{"type":"Polygon","coordinates":[[[104.897705,11.522888],[104.9055436,11.5207378],[104.9108865,11.5194973],[104.912903,11.519104],[104.916321,11.518677],[104.920288,11.520691],[104.921509,11.525696],[104.918091,11.5271],[104.915527,11.528931],[104.9113984,11.5273291],[104.897762,11.528044],[104.897522,11.526306],[104.897705,11.522888]]]}}
+      ]
+    };
+
+    // Normalize month strings to YYYY-MM format
+    const normalizeMonth = (monthStr) => {
+      const date = new Date(monthStr);
+      if (isNaN(date.getTime())) return null; // Invalid date
+      return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+    };
+
+    const timeData = {
+      open: [...new Set((datasets.dataset1 || [])
+        .filter(item => item.status === "New" && normalizeMonth(item.month))
+        .map(item => normalizeMonth(item.month)))].sort(),
+      closed: [...new Set((datasets.dataset1 || [])
+        .filter(item => item.status === "Closed" && normalizeMonth(item.month))
+        .map(item => normalizeMonth(item.month)))].sort(),
+      dataset2: [...new Set((datasets.dataset2 || []).map(item => item.year))].sort((a, b) => a - b)
+    };
+
+    // Add display-friendly time labels
+    const timeLabels = {
+      open: timeData.open.map(month => {
+        const date = new Date(`${month}-01`);
+        return date.toLocaleString('default', { month: 'long', year: 'numeric' });
+      }),
+      closed: timeData.closed.map(month => {
+        const date = new Date(`${month}-01`);
+        return date.toLocaleString('default', { month: 'long', year: 'numeric' });
+      }),
+      dataset2: timeData.dataset2
+    };
+    
+    const generateRanges = (data, valueKey, numRanges) => {
+      const values = data.map(item => item[valueKey]).filter(v => typeof v === 'number');
+
+      if (values.length === 0) return Array.from({ length: numRanges }, (_, i) => i);
+
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+
+      console.log(data)
+
+      if (min === max) {
+        const step = Math.ceil(max / numRanges) || 1;
+        return Array.from({ length: numRanges }, (_, i) => i * step);
+      }
+
+      const range = max - min;
+      const roughStep = range / numRanges;
+      const magnitude = Math.pow(10, Math.floor(Math.log10(roughStep)));
+      const niceSteps = [1, 2, 5, 10];
+
+      let niceStep = niceSteps.find(step => step * magnitude >= roughStep);
+      if (!niceStep) niceStep = 10;
+      niceStep *= magnitude;
+
+      const niceMin = Math.floor(min / niceStep) * niceStep;
+
+      const ranges = [];
+      for (let i = 0; i < numRanges; i++) {
+        ranges.push(niceMin + i * niceStep);
+      }
+
+      return ranges;
+    };
+
+    const colorScales = {
+      open: {
+        ranges: generateRanges((datasets.dataset1 || []).filter(d => d.status === "New"), 'count', 4),
+        colors: ['#FD8D3C', '#FC4E2A', '#E31A1C', '#BD0026', '#800026']
+      },
+      closed: {
+        ranges: generateRanges((datasets.dataset1 || []).filter(d => d.status === "Closed"), 'count', 4),
+        colors: ['#FEE0D2', '#FCBBA1', '#FC9272', '#FB6A4A', '#EF3B2C']
+      },
+      dataset2: {
+        ranges: generateRanges(datasets.dataset2 || [], 'est_count', 4),
+        colors: ['#deebf7', '#9ecae1', '#6baed6', '#3182bd', '#08519c']
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const map = L.map('leaflet-map').setView([11.5239, 104.9008], 13);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      let currentDataset = 'open';
+      let currentTimeIndex = 0;
+      let geoJsonLayer;
+      let animationInterval;
+      let labelLayers = [];
+      let pieChartStatus = null;
+      let lineChartTrends = null;
+      let barChartType = null;
+      let lineChartYears = null;
+
+      const getColor = (value, dataset) => {
+        const {ranges, colors} = colorScales[dataset] || {ranges: [], colors: []};
+        for (let i = 0; i < ranges.length - 1; i++) {
+          if (value <= ranges[i + 1]) return colors[i];
+        }
+        return colors[ranges.length - 1] || '#cccccc';
+      };
+
+      const getDistrictData = (districtName) => {
+        if (currentDataset === 'open' || currentDataset === 'closed') {
+          const data = datasets.dataset1 || [];
+          const status = currentDataset === 'open' ? 'New' : 'Closed';
+          const selectedMonth = timeData[currentDataset][currentTimeIndex];
+          if (!selectedMonth) {
+            return { value: 0, status: `${status} Establishments (No data)` };
+          }
+          const items = data.filter(d => 
+            d.a3 === districtName && 
+            normalizeMonth(d.month) === selectedMonth && 
+            d.status === status
+          );
+          const value = items.reduce((sum, d) => sum + (d.count || 0), 0);
+          return { 
+            value,
+            status: `${status} Establishments`
+          };
+        } else {
+          const data = datasets.dataset2 || [];
+          const year = timeData.dataset2[currentTimeIndex];
+          if (!year) {
+            return { value: 0, status: 'No data' };
+          }
+          const items = data.filter(d => d.a3 === districtName && d.year === year); // Filter for exact year
+          const value = items.reduce((sum, d) => sum + (d.est_count || 0), 0);
+          return { 
+            value,
+            status: items.length ? `Established in ${year}` : 'No data'
+          };
+        }
+      };
+
+      ////////////////// Map Visualization ///////////////////
+      const renderPieChartStatus = (districtName) => {
+        const chartData = (datasets.dataset3 || []).filter(item => item.a3 === districtName);
+        const container = document.getElementById('pie-chart-status');
+        
+        if (pieChartStatus) {
+          pieChartStatus.dispose();
+          pieChartStatus = null;
+        }
+        container.innerHTML = '';
+
+        if (chartData.length === 0) {
+          container.innerHTML = '<p class="text-gray-500 text-center py-8">No chart data available for this district</p>';
+          return;
+        }
+
+        pieChartStatus = echarts.init(container, { renderer: 'svg' });
+        
+        const option = {
+          tooltip: {
+            trigger: 'item',
+            formatter: params => `
+              <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${params.color};margin-right:5px;"></span>
+              <strong>${params.name}</strong>: ${params.value.toLocaleString()} (${params.percent}%)
+            `,
+            backgroundColor: '#fff',
+            textStyle: { color: '#333' },
+            extraCssText: 'box-shadow:0 0 10px rgba(0,0,0,0.2);'
+          },
+          legend: {
+            bottom: 0,
+            data: chartData.map(item => item.status)
+          },
+          series: [{
+            name: 'Establishment Status',
+            type: 'pie',
+            radius: ['50%', '70%'],
+            avoidLabelOverlap: false,
+            itemStyle: {
+              muscle: 10,
+              borderColor: '#fff',
+              borderWidth: 2
+            },
+            label: {
+              show: false,
+              position: 'center'
+            },
+            emphasis: {
+              label: {
+                show: false,
+              }
+            },
+            labelLine: { show: false },
+            data: chartData.map(item => ({
+              value: item.count,
+              name: item.status,
+              label: item.label
+            }))
+          }]
+        };
+
+        pieChartStatus.setOption(option);
+      };
+
+      const renderBarChartType = (districtName) => {
+        const districtData = (datasets.dataset4 || []).filter(item => item.a3 === districtName);
+        const container = document.getElementById('pie-chart-type');
+        
+        if (barChartType) {
+          barChartType.dispose();
+          barChartType = null;
+        }
+        container.innerHTML = '';
+
+        if (districtData.length === 0) {
+          container.innerHTML = '<p class="text-gray-500 text-center py-8">No type data available</p>';
+          return;
+        }
+
+        const totals = {};
+        districtData.forEach(item => {
+          if (!totals[item.type]) totals[item.type] = 0;
+          totals[item.type] += item.count;
+        });
+        const types = Object.keys(totals).sort((a, b) => totals[b] - totals[a]);
+        const statuses = ['Opened', 'Closed'];
+        const colors = { 'Opened': '#336666', 'Closed': '#E31A1C' };
+
+        const series = statuses.map(status => ({
+          name: status,
+          type: 'bar',
+          stack: 'total',
+          data: types.map(type => {
+            const item = districtData.find(d => d.type === type && d.status === status);
+            return item ? item.count : 0;
+          }),
+          itemStyle: { color: colors[status] || '#336666' }
+        }));
+
+        barChartType = echarts.init(container, { renderer: 'svg' });
+
+        // Detect if the screen is small (e.g., phone)
+        const isSmallScreen = window.innerWidth <= 640; // Tailwind's 'sm' breakpoint
+
+        const option = {
+          tooltip: {
+            trigger: 'axis',
+            formatter: params => {
+              let result = `<strong>${params[0].name}</strong><br/>`;
+              params.forEach(p => {
+                if (p.value > 0) {
+                  result += `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:5px;"></span>${p.seriesName}: ${p.value.toLocaleString()}<br/>`;
+                }
+              });
+              return result;
+            },
+            backgroundColor: '#fff',
+            textStyle: { color: '#333', fontSize: isSmallScreen ? 10 : 12 },
+            extraCssText: 'box-shadow:0 0 10px rgba(0,0,0,0.2);'
+          },
+          legend: {
+            data: statuses,
+            bottom: 0,
+            textStyle: { fontSize: isSmallScreen ? 10 : 12 }
+          },
+          grid: {
+            left: isSmallScreen ? '5%' : '3%',
+            right: isSmallScreen ? '5%' : '4%',
+            bottom: isSmallScreen ? '20%' : '15%',
+            top: isSmallScreen ? '5%' : '10%',
+            containLabel: true
+          },
+          xAxis: {
+            type: 'value',
+            axisLabel: {
+              fontSize: isSmallScreen ? 8 : 10,
+              interval: 0,
+              formatter: value => value.toLocaleString()
+            },
+            name: ''
+          },
+          yAxis: {
+            type: 'category',
+            data: types,
+            axisLabel: {
+              fontSize: isSmallScreen ? 8 : 10,
+              rotate: isSmallScreen ? 45 : 0, // Rotate labels on small screens
+              formatter: value => value.length > 10 ? value.substring(0, 10) + '...' : value // Truncate long labels
+            }
+          },
+          series: series
+        };
+
+        barChartType.setOption(option);
+
+        // Ensure chart resizes after modal is shown
+        setTimeout(() => barChartType.resize(), 100);
+      };
+
+      const renderLineChartTrends = (districtName) => {
+        const districtData = (datasets.dataset1 || []).filter(item => item.a3 === districtName);
+        const container = document.getElementById('line-chart-trends');
+        
+        if (lineChartTrends) {
+          lineChartTrends.dispose();
+          lineChartTrends = null;
+        }
+        container.innerHTML = '';
+        
+        if (districtData.length === 0) {
+          container.innerHTML = '<p class="text-gray-500 text-center py-8">No trend data available</p>';
+          return;
+        }
+
+        const statusGroups = {};
+        districtData.forEach(item => {
+          if (!statusGroups[item.status]) statusGroups[item.status] = [];
+          statusGroups[item.status].push(item);
+        });
+
+        const allMonths = [...new Set((datasets.dataset1 || []).map(item => normalizeMonth(item.month)).filter(m => m))].sort();
+
+        const series = [];
+        const colors = { 'New': '#336666', 'Closed': '#E31A1C' };
+
+        ['New', 'Closed'].forEach(status => {
+          const statusData = statusGroups[status] || [];
+          const dataPoints = allMonths.map(month => {
+            const matchingData = statusData.find(item => normalizeMonth(item.month) === month);
+            return matchingData ? matchingData.count : 0;
+          });
+
+          series.push({
+            name: status,
+            type: 'line',
+            data: dataPoints,
+            smooth: true,
+            lineStyle: { width: 3, color: colors[status] || '#336666' },
+            itemStyle: { color: colors[status] || '#336666' },
+            symbol: 'circle',
+            symbolSize: 8,
+            emphasis: { focus: 'series' }
+          });
+        });
+
+        lineChartTrends = echarts.init(container, { renderer: 'svg' });
+        
+        const option = {
+          tooltip: {
+            trigger: 'axis',
+            formatter: params => {
+              let result = `<strong>${params[0].axisValue}</strong><br/>`;
+              params.forEach(p => {
+                if (p.value > 0) {
+                  result += `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:5px;"></span>${p.seriesName}: ${p.value.toLocaleString()}<br/>`;
+                }
+              });
+              return result;
+            },
+            backgroundColor: '#fff',
+            textStyle: { color: '#333' },
+            extraCssText: 'box-shadow:0 0 10px rgba(0,0,0,0.2);'
+          },
+          legend: { data: ['New', 'Closed'], bottom: 0 },
+          xAxis: { 
+            type: 'category', 
+            data: allMonths.map(month => {
+              const date = new Date(`${month}-01`);
+              return date.toLocaleString('default', { month: 'short', year: 'numeric' });
+            }), 
+            axisLabel: { rotate: 45 }, 
+            boundaryGap: false 
+          },
+          yAxis: { type: 'value', name: '' },
+          series: series,
+          grid: { left: '3%', right: '4%', bottom: '15%', top: '10%', containLabel: true },
+          color: ['#336666', '#E31A1C']
+        };
+
+        lineChartTrends.setOption(option);
+      };
+
+      const renderLineChartYears = (districtName) => {
+        const districtData = (datasets.dataset2 || []).filter(item => item.a3 === districtName);
+        const container = document.getElementById('line-chart-years');
+        
+        if (lineChartYears) {
+          lineChartYears.dispose();
+          lineChartYears = null;
+        }
+        container.innerHTML = '';
+        
+        if (districtData.length === 0) {
+          container.innerHTML = '<p class="text-gray-500 text-center py-8">No establishment data available</p>';
+          return;
+        }
+
+        const allYears = [...new Set(districtData.map(item => item.year))].sort((a, b) => a - b);
+
+        const series = [{
+          name: 'Establishments',
+          type: 'line',
+          data: allYears.map(year => {
+            const item = districtData.find(d => d.year === year);
+            return item ? item.est_count : 0;
+          }),
+          smooth: true,
+          lineStyle: { width: 3, color: '#336666' },
+          itemStyle: { color: '#336666' },
+          symbol: 'circle',
+          symbolSize: 8,
+          emphasis: { focus: 'series' }
+        }];
+
+        lineChartYears = echarts.init(container, { renderer: 'svg' });
+        
+        const option = {
+          tooltip: {
+            trigger: 'axis',
+            formatter: params => {
+              const p = params[0];
+              return `
+                <strong>${p.axisValue}</strong><br/>
+                <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:5px;"></span>
+                ${p.value.toLocaleString()} Establishments
+              `;
+            },
+            backgroundColor: '#fff',
+            textStyle: { color: '#333' },
+            extraCssText: 'box-shadow:0 0 10px rgba(0,0,0,0.2);'
+          },
+          legend: { data: ['Establishments'], bottom: 0 },
+          xAxis: { type: 'category', data: allYears, axisLabel: { rotate: 45 }, boundaryGap: false },
+          yAxis: { type: 'value', name: '' },
+          series: series,
+          grid: { left: '3%', right: '4%', bottom: '15%', top: '10%', containLabel: true },
+          color: ['#336666']
+        };
+
+        lineChartYears.setOption(option);
+      };
+
+      const updateMap = () => {
+        if (geoJsonLayer) map.removeLayer(geoJsonLayer);
+        labelLayers.forEach(label => map.removeLayer(label));
+        labelLayers = [];
+        
+        geoJsonLayer = L.geoJSON(districtsGeoJSON, {
+          style: (feature) => {
+            const {value} = getDistrictData(feature.properties.name);
+            return {
+              fillColor: getColor(value, currentDataset),
+              weight: 2, opacity: 1, color: 'white', dashArray: '3', fillOpacity: 0.7
+            };
+          },
+          onEachFeature: (feature, layer) => {
+            const {value, status} = getDistrictData(feature.properties.name);
+
+            const centroid = layer.getBounds().getCenter();
+            const labelMarker = L.marker(centroid, {
+              icon: L.divIcon({
+                className: 'custom-label',
+                html: value.toLocaleString(),
+                iconSize: [20, 40],
+                iconAnchor: [10, 20]
+              }),
+              interactive: false
+            });
+            labelMarker.addTo(map);
+            labelLayers.push(labelMarker);
+            
+            layer.on({
+              click: () => {
+                geoJsonLayer.eachLayer(l => geoJsonLayer.resetStyle(l));
+                layer.setStyle({ weight: 3, color: '#666', dashArray: '', fillOpacity: 0.9 }).bringToFront();
+                document.getElementById('modal-district').textContent = `Sangkat ${feature.properties.name}`;
+                document.getElementById('map-modal').classList.remove('hidden');
+                
+                setTimeout(() => {
+                  renderPieChartStatus(feature.properties.name);
+                  renderLineChartTrends(feature.properties.name);
+                  renderBarChartType(feature.properties.name);
+                  renderLineChartYears(feature.properties.name);
+                }, 10);
+              },
+              mouseover: () => layer.setStyle({ weight: 3, color: '#666', dashArray: '', fillOpacity: 0.9 }).bringToFront(),
+              mouseout: () => geoJsonLayer.resetStyle(layer)
+            }).bindTooltip(
+              `
+              <strong>${feature.properties.name}</strong><br/>
+              <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#3498db;margin-right:5px;"></span>
+              ${
+                currentDataset === 'open' ? `Openings: ${value.toLocaleString()}` :
+                currentDataset === 'closed' ? `Closures: ${value.toLocaleString()}` :
+                `Establishments: ${value.toLocaleString()}`
+              }
+              `,
+              { direction: 'top', sticky: true, className: 'custom-tooltip' }
+            );
+          }
+        }).addTo(map);
+        
+        updateLegend();
+        updateTitleLegend();
+      };
+
+      const updateTitleLegend = () => {
+        document.querySelector('.title-legend')?.remove();
+        const legend = L.control({position: 'topright'});
+        
+        legend.onAdd = () => {
+          const div = L.DomUtil.create('div', 'title-legend bg-white p-3 rounded-lg shadow-md border border-gray-200');
+          const timeLabel = timeLabels[currentDataset][currentTimeIndex] || 'No time data';
+          
+          div.innerHTML = `
+            <div class="flex flex-col">
+              <h4 class="text-sm font-bold text-gray-800 mb-1">
+                ${
+                  currentDataset === 'open' ? 'Number of open establishments' :
+                  currentDataset === 'closed' ? 'Number of closed establishments' :
+                  'Number of establishments by year of opening'
+                }
+              </h4>
+              <div class="flex items-center text-sm text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                ${timeLabel}
+              </div>
+            </div>
+          `;
+          return div;
+        };
+        
+        legend.addTo(map);
+      };
+
+      const updateLegend = () => {
+        document.querySelector('.info.legend')?.remove();
+        const legend = L.control({position: 'bottomright'});
+        
+        legend.onAdd = () => {
+          const div = L.DomUtil.create('div', 'info legend bg-white p-2 rounded shadow');
+          const {ranges, colors} = colorScales[currentDataset] || {ranges: [], colors: []};
+          
+          div.innerHTML = `<h4 class="font-bold mb-2">${
+            currentDataset === 'open' ? 'Openings Count' :
+            currentDataset === 'closed' ? 'Closures Count' :
+            'Establishment Count'
+          }</h4>`;
+          ranges.forEach((range, i) => {
+            if (i < colors.length) {
+              div.innerHTML += `<div class="flex items-center mb-1"><i style="background:${colors[i]};width:12px;height:12px;display:inline-block;margin-right:5px;"></i>${range}${ranges[i+1] ? `–${ranges[i+1]}` : '+'}</div>`;
+            }
+          });
+          return div;
+        };
+        
+        legend.addTo(map);
+      };
+
+      const updateTimeSlider = () => {
+        const slider = document.getElementById('time-slider');
+        const timeLabel = document.getElementById('time-label');
+        const timePeriodLabel = document.getElementById('time-period-label');
+        
+        const timeDataLength = (timeData[currentDataset] || []).length;
+        slider.min = 0;
+        slider.max = timeDataLength > 0 ? timeDataLength - 1 : 0;
+        
+        // Initialize slider value
+        slider.value = currentDataset === 'dataset2' && timeDataLength > 0 ? timeDataLength - 1 : 0;
+        currentTimeIndex = parseInt(slider.value) || 0;
+        
+        // Disable slider if no or single time point
+        slider.disabled = timeDataLength <= 1;
+        
+        // Use display-friendly labels
+        timeLabel.textContent = timeLabels[currentDataset][currentTimeIndex] || 'No time data';
+        timePeriodLabel.textContent = currentDataset === 'dataset2' ? 'Year:' : 'Month:';
+        
+        updateMap();
+      };
+
+      document.getElementById('dataset-selector').addEventListener('change', function() {
+        currentDataset = this.value;
+        updateTimeSlider();
+      });
+
+      document.querySelector('.close-button').addEventListener('click', () => {
+        document.getElementById('map-modal').classList.add('hidden');
+      });
+
+      document.getElementById('play-button').addEventListener('click', function() {
+        this.disabled = true;
+        document.getElementById('stop-button').disabled = false;
+        this.classList.replace('bg-[#336666]', 'bg-gray-400');
+        
+        animationInterval = setInterval(() => {
+          const slider = document.getElementById('time-slider');
+          let nextIndex = parseInt(slider.value) + 1;
+          if (nextIndex > (timeData[currentDataset] || []).length - 1) nextIndex = 0;
+          slider.value = nextIndex;
+          updateTimePeriod();
+        }, 1000);
+      });
+
+      document.getElementById('stop-button').addEventListener('click', function() {
+        document.getElementById('play-button').disabled = false;
+        this.disabled = true;
+        document.getElementById('play-button').classList.replace('bg-gray-400', 'bg-[#336666]');
+        clearInterval(animationInterval);
+      });
+
+      document.getElementById('time-slider').addEventListener('input', updateTimePeriod);
+
+      function updateTimePeriod() {
+        currentTimeIndex = parseInt(document.getElementById('time-slider').value) || 0;
+        document.getElementById('time-label').textContent = timeLabels[currentDataset][currentTimeIndex] || 'No time data';
+        updateMap();
+      }
+
+      window.addEventListener('resize', () => {
+        if (pieChartStatus) pieChartStatus.resize();
+        if (lineChartTrends) lineChartTrends.resize();
+        if (barChartType) barChartType.resize();
+        if (lineChartYears) lineChartYears.resize();
+      });
+
+      document.getElementById('map-modal').addEventListener('shown', () => {
+        if (pieChartStatus) pieChartStatus.resize();
+        if (lineChartTrends) lineChartTrends.resize();
+        if (barChartType) barChartType.resize();
+        if (lineChartYears) lineChartYears.resize();
+      });
+
+      new ResizeObserver(() => map.invalidateSize()).observe(document.getElementById('leaflet-map'));
+      updateTimeSlider();
+
+      // Close modal when clicking outside the modal content
+      document.getElementById('map-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          this.classList.add('hidden');
+        }
+      });
+
+      // Close modal when pressing the Esc key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !document.getElementById('map-modal').classList.contains('hidden')) {
+          document.getElementById('map-modal').classList.add('hidden');
+        }
+      });
+    });
+  </script>
+
+  <script>
+    let chart = null; // Cache the chart instance
+
+    const renderSangkatStackedBarChart = () => {
+      const container = document.getElementById('compare-bar-chart-status');
+      const datasetSelect = document.getElementById('dataset-select');
+      const selectedDataset = datasetSelect.value; // Get selected dataset
+
+      try {
+        if (typeof echarts === 'undefined') {
+          throw new Error('ECharts library not loaded');
+        }
+
+        let data, sangkats, series, chartTitle, validData;
+        if (selectedDataset === 'compare-dataset3') {
+          // Handle dataset3 (Operating and Closed Establishments by Sangkat)
+          if (!datasets?.dataset3 || !Array.isArray(datasets.dataset3) || datasets.dataset3.length === 0) {
+            throw new Error('No valid data available for dataset3');
+          }
+
+          sangkats = [...new Set(datasets.dataset3.map(item => item.a3).filter(Boolean))];
+          const statuses = [...new Set(datasets.dataset3.map(item => item.status).filter(Boolean))];
+          validData = datasets.dataset3.filter(item => item.a3 && item.status && typeof item.percentage === 'number');
+
+          if (validData.length === 0) {
+            throw new Error('No valid data items after filtering for dataset3');
+          }
+
+          series = statuses.map(status => ({
+            name: status,
+            type: 'bar',
+            stack: 'total',
+            data: sangkats.map(sangkat => {
+              const item = validData.find(d => d.a3 === sangkat && d.status === status);
+              return item ? item.percentage : 0;
+            }),
+            itemStyle: {
+              borderRadius: [0, 4, 4, 0],
+              borderColor: '#fff',
+              borderWidth: 1
+            },
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowColor: 'rgba(0, 0, 0, 0.2)'
+              }
+            },
+            label: {
+              show: true,
+              position: 'inside',
+              formatter: ({ value }) => (value > 5 ? `${value}%` : ''),
+              fontSize: 10
+            },
+            animation: true,
+            animationDuration: 1000,
+            animationDelay: function (idx) {
+              return idx * 100; // Left-to-right animation based on Sangkat index
+            }
+          }));
+
+          chartTitle = 'Operating and Closed Establishments by Sangkat';
+        } else if (selectedDataset === 'compare-dataset5') {
+          // Handle dataset5 (Open Establishments by Sangkat)
+          if (!datasets?.dataset5 || !Array.isArray(datasets.dataset5) || datasets.dataset5.length === 0) {
+            throw new Error('No valid data available for dataset5');
+          }
+
+          sangkats = [...new Set(datasets.dataset5.map(item => item.a3).filter(Boolean))];
+          validData = datasets.dataset5.filter(item => item.a3 && typeof item.count === 'number');
+
+          if (validData.length === 0) {
+            throw new Error('No valid data items after filtering for dataset5');
+          }
+
+          const totalCount = validData.reduce((sum, item) => sum + item.count, 0);
+
+          series = [{
+            name: 'Open Establishments',
+            type: 'bar',
+            data: sangkats.map(sangkat => {
+              const item = validData.find(d => d.a3 === sangkat);
+              return item ? item.count : 0;
+            }),
+            itemStyle: {
+              borderRadius: [0, 4, 4, 0],
+              borderColor: '#fff',
+              borderWidth: 1
+            },
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowColor: 'rgba(0, 0, 0, 0.2)'
+              }
+            },
+            label: {
+              show: true,
+              position: 'inside',
+              formatter: ({ value }) => (value > 0 ? value : ''),
+              fontSize: 10
+            },
+            animation: true,
+            animationDuration: 1000,
+            animationDelay: function (idx) {
+              return idx * 100; // Left-to-right animation
+            }
+          }];
+
+          chartTitle = 'Open Establishments by Sangkat';
+        } else if (selectedDataset === 'compare-dataset6') {
+          // Handle dataset6 (Registration Status by Sangkat)
+          if (!datasets?.dataset6 || !Array.isArray(datasets.dataset6) || datasets.dataset6.length === 0) {
+            throw new Error('No valid data available for dataset6');
+          }
+
+          sangkats = [...new Set(datasets.dataset6.map(item => item.a3).filter(Boolean))];
+          const registrationStatuses = [...new Set(datasets.dataset6.map(item => item.q7).filter(Boolean))].sort((a, b) => {
+            // Sort to ensure "Not Registered" stacks first (left), then "Registered" (right)
+            if (a === 'Not Registered') return -1;
+            if (b === 'Not Registered') return 1;
+            return a.localeCompare(b);
+          });
+          validData = datasets.dataset6.filter(item => item.a3 && item.q7 && typeof item.n === 'number' && typeof item.percent === 'number');
+
+          if (validData.length === 0) {
+            throw new Error('No valid data items after filtering for dataset6');
+          }
+
+          series = registrationStatuses.map(status => ({
+            name: status,
+            type: 'bar',
+            stack: 'total',
+            data: sangkats.map(sangkat => {
+              const item = validData.find(d => d.a3 === sangkat && d.q7 === status);
+              return item ? item.n : 0; // Use count (n) for bar height
+            }),
+            itemStyle: {
+              borderRadius: [0, 4, 4, 0],
+              borderColor: '#fff',
+              borderWidth: 1
+            },
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowColor: 'rgba(0, 0, 0, 0.2)'
+              }
+            },
+            label: {
+              show: true,
+              position: 'inside',
+              formatter: ({ value, dataIndex }) => {
+                const item = validData.find(d => d.a3 === sangkats[dataIndex] && d.q7 === status);
+                const percent = item ? item.percent.toFixed(2) : '0.00';
+                return value > 0 ? `${value} (${percent}%)` : '';
+              },
+              fontSize: 10
+            },
+            animation: true,
+            animationDuration: 1000,
+            animationDelay: function (idx) {
+              return idx * 100; // Left-to-right animation based on Sangkat index
+            }
+          }));
+
+          chartTitle = 'Registration Status by Sangkat';
+        } else {
+          throw new Error('Invalid dataset selected');
+        }
+
+        // Create or update chart container
+        let chartDiv = container.querySelector('div');
+        if (!chartDiv) {
+          container.innerHTML = '';
+          chartDiv = document.createElement('div');
+          chartDiv.className = 'w-full h-full';
+          container.appendChild(chartDiv);
+        }
+
+        // Initialize chart if not already done
+        if (!chart) {
+          chart = echarts.init(chartDiv, { renderer: 'svg' });
+
+          // Resize handling with controlled animation
+          let lastWidth = chartDiv.offsetWidth;
+          let lastHeight = chartDiv.offsetHeight;
+
+          const resizeObserver = new ResizeObserver(() => {
+            if (!chart || document.getElementById('section-2').classList.contains('hidden')) {
+              return;
+            }
+
+            const currentWidth = chartDiv.offsetWidth;
+            const currentHeight = chartDiv.offsetHeight;
+
+            if (currentWidth !== lastWidth || currentHeight !== lastHeight) {
+              chart.resize({
+                animation: {
+                  duration: 1000,
+                  easing: 'linear'
+                }
+              });
+              lastWidth = currentWidth;
+              lastHeight = currentHeight;
+            }
+          });
+          resizeObserver.observe(chartDiv);
+
+          // Clean up when container is removed
+          container.addEventListener('DOMNodeRemoved', () => {
+            resizeObserver.disconnect();
+            if (chart) {
+              chart.dispose();
+              chart = null;
+            }
+          });
+        }
+
+        // Calculate responsive font size and spacing
+        const isSmallScreen = window.innerWidth <= 640;
+        const titleFontSize = isSmallScreen ? 14 : 16;
+        const dataSourceFontSize = isSmallScreen ? 10 : 12;
+        const gridBottom = isSmallScreen ? '12%' : '10%';
+
+        const option = {
+          title: {
+            text: chartTitle,
+            left: 'center',
+            top: isSmallScreen ? 5 : 10,
+            bottom: 10,
+            textStyle: {
+              fontSize: titleFontSize,
+              fontWeight: 'bold',
+              color: '#333'
+            }
+          },
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+              type: 'shadow'
+            },
+            formatter: params => {
+              const sangkat = sangkats[params[0].dataIndex];
+              let content = `<div class="font-medium">${sangkat}</div>`;
+              let total = 0;
+              params.forEach(param => {
+                if (param.value > 0) {
+                  let valueDisplay;
+                  if (selectedDataset === 'compare-dataset3') {
+                    valueDisplay = `${param.value}%`;
+                  } else if (selectedDataset === 'compare-dataset6') {
+                    const item = validData.find(d => d.a3 === sangkat && d.q7 === param.seriesName);
+                    const percent = item ? item.percent.toFixed(2) : '0.00';
+                    valueDisplay = `${param.value} (${percent}%)`;
+                  } else {
+                    valueDisplay = param.value;
+                  }
+                  total += parseFloat(param.value);
+                  content += `
+                    <div class="flex items-center">
+                      <span class="inline-block w-3 h-3 rounded-full mr-2" style="background:${param.color}"></span>
+                      <span>${param.seriesName}:</span>
+                      <span class="ml-auto pl-4">${valueDisplay}</span>
+                    </div>`;
+                }
+              });
+              if (selectedDataset !== 'compare-dataset5') {
+                content += `<div class="font-medium mt-1">Total: ${total}${selectedDataset === 'compare-dataset3' ? '%' : ''}</div>`;
+              }
+              return content;
+            },
+            backgroundColor: 'rgba(255, 255, 255, 0.96)',
+            borderWidth: 0,
+            extraCssText: 'box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); padding: 8px 12px; border-radius: 6px;'
+          },
+          legend: {
+            data: selectedDataset === 'compare-dataset3' 
+              ? [...new Set(datasets.dataset3.map(item => item.status).filter(Boolean))]
+              : selectedDataset === 'compare-dataset6'
+              ? [...new Set(datasets.dataset6.map(item => item.q7).filter(Boolean))].sort((a, b) => {
+                  if (a === 'Not Registered') return -1;
+                  if (b === 'Not Registered') return 1;
+                  return a.localeCompare(b);
+                })
+              : ['Open Establishments'],
+            bottom: 20,
+            textStyle: { fontSize: isSmallScreen ? 10 : 12 }
+          },
+          graphic: {
+            type: 'text',
+            left: 'center',
+            bottom: 0,
+            style: {
+              text: 'Data source: Cambodia Development Resource Institute',
+              font: `italic ${dataSourceFontSize}px 'Roboto', sans-serif`,
+              fill: '#4B5563',
+              textAlign: 'center'
+            }
+          },
+          xAxis: {
+            type: 'value',
+            axisLabel: {
+              formatter: selectedDataset === 'compare-dataset3' ? '{value}%' : '{value}',
+              fontSize: isSmallScreen ? 8 : 10
+            },
+            max: selectedDataset === 'compare-dataset3' ? 100 : null
+          },
+          yAxis: {
+            type: 'category',
+            data: sangkats,
+            axisLabel: { fontSize: isSmallScreen ? 8 : 10, margin: 8 },
+            axisTick: { alignWithLabel: true }
+          },
+          grid: {
+            left: isSmallScreen ? '8%' : '5%',
+            right: isSmallScreen ? '8%' : '5%',
+            bottom: gridBottom,
+            top: isSmallScreen ? '15%' : '10%',
+            containLabel: true
+          },
+          series: series,
+          animation: true,
+          animationDuration: 1000,
+          animationDurationUpdate: 1000,
+          animationEasing: 'linear',
+          animationDelay: function (idx) {
+            return idx * 100; // Left-to-right animation
+          },
+          animationDelayUpdate: function (idx) {
+            return idx * 100;
+          }
+        };
+
+        // Set chart options
+        chart.setOption(option, true);
+
+        // Force resize with animation
+        setTimeout(() => {
+          if (chart && !document.getElementById('section-2').classList.contains('hidden')) {
+            chart.resize({
+              animation: {
+                duration: 1000,
+                easing: 'linear'
+              }
+            });
+          }
+        }, 0);
+
+      } catch (error) {
+        console.error('Visualization error:', error);
+        container.innerHTML = `
+          <div class="text-center py-8">
+            <div class="text-red-500 mb-2">Error loading visualization</div>
+            <div class="text-gray-500 text-sm">${error.message}</div>
+          </div>`;
+      }
+    };
+
+    // Update showSection to handle chart rendering
+    function showSection(index) {
+      document.querySelectorAll('main section').forEach((sec, i) => {
+        sec.classList.toggle('hidden', i !== index);
+      });
+      document.querySelectorAll('aside button').forEach((btn, i) => {
+        btn.classList.toggle('active', i === index);
+      });
+
+      if (index === 2) {
+        setTimeout(() => {
+          renderSangkatStackedBarChart();
+          if (chart) {
+            chart.setOption(chart.getOption(), {
+              notMerge: true,
+              animation: true,
+              animationDuration: 1000,
+              animationEasing: 'linear'
+            });
+            chart.resize({
+              animation: {
+                duration: 1000,
+                easing: 'linear'
+              }
+            });
+          }
+        }, 0);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!document.getElementById('section-2').classList.contains('hidden')) {
+        renderSangkatStackedBarChart();
+      }
+
+      const datasetSelect = document.getElementById('dataset-select');
+      if (datasetSelect) {
+        datasetSelect.addEventListener('change', () => {
+          renderSangkatStackedBarChart();
+          if (chart) {
+            chart.setOption(chart.getOption(), {
+              notMerge: true,
+              animation: true,
+              animationDuration: 1000,
+              animationEasing: 'linear'
+            });
+            chart.resize({
+              animation: {
+                duration: 1000,
+                easing: 'linear'
+              }
+            });
+          }
+        });
+      }
+    });
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (chart && !document.getElementById('section-2').classList.contains('hidden')) {
+          renderSangkatStackedBarChart();
+          chart.resize({
+            animation: {
+              duration: 1000,
+              easing: 'linear'
+            }
+          });
+        }
+      }, 200);
+    });
+  </script>
+
+</body>
+</html>
