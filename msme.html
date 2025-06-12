@@ -5299,431 +5299,440 @@
   <script>
     let chart = null; // Cache the chart instance
 
-    const renderSangkatStackedBarChart = () => {
-      const container = document.getElementById('compare-bar-chart-status');
-      const datasetSelect = document.getElementById('dataset-select');
-      const selectedDataset = datasetSelect.value; // Get selected dataset
+// Function to wait for ECharts to load
+const waitForECharts = (callback) => {
+  if (typeof echarts !== 'undefined') {
+    callback();
+  } else {
+    setTimeout(() => waitForECharts(callback), 100);
+  }
+};
 
-      try {
-        if (typeof echarts === 'undefined') {
-          throw new Error('ECharts library not loaded');
-        }
+const renderSangkatStackedBarChart = () => {
+  const container = document.getElementById('compare-bar-chart-status');
+  const datasetSelect = document.getElementById('dataset-select');
+  const selectedDataset = datasetSelect.value; // Get selected dataset
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-        let data, sangkats, series, chartTitle, validData;
-        if (selectedDataset === 'compare-dataset3') {
-          // Handle dataset3 (Operating and Closed Establishments by Sangkat)
-          if (!datasets?.dataset3 || !Array.isArray(datasets.dataset3) || datasets.dataset3.length === 0) {
-            throw new Error('No valid data available for dataset3');
-          }
-
-          sangkats = [...new Set(datasets.dataset3.map(item => item.a3).filter(Boolean))];
-          const statuses = [...new Set(datasets.dataset3.map(item => item.status).filter(Boolean))];
-          validData = datasets.dataset3.filter(item => item.a3 && item.status && typeof item.percentage === 'number');
-
-          if (validData.length === 0) {
-            throw new Error('No valid data items after filtering for dataset3');
-          }
-
-          series = statuses.map(status => ({
-            name: status,
-            type: 'bar',
-            stack: 'total',
-            data: sangkats.map(sangkat => {
-              const item = validData.find(d => d.a3 === sangkat && d.status === status);
-              return item ? item.percentage : 0;
-            }),
-            itemStyle: {
-              borderRadius: [0, 4, 4, 0],
-              borderColor: '#fff',
-              borderWidth: 1
-            },
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowColor: 'rgba(0, 0, 0, 0.2)'
-              }
-            },
-            label: {
-              show: true,
-              position: 'inside',
-              formatter: ({ value }) => (value > 5 ? `${value}%` : ''),
-              fontSize: 10
-            },
-            animation: true,
-            animationDuration: 1000,
-            animationDelay: function (idx) {
-              return idx * 100; // Left-to-right animation based on Sangkat index
-            }
-          }));
-
-          chartTitle = 'Operating and Closed Establishments by Sangkat';
-        } else if (selectedDataset === 'compare-dataset5') {
-          // Handle dataset5 (Open Establishments by Sangkat)
-          if (!datasets?.dataset5 || !Array.isArray(datasets.dataset5) || datasets.dataset5.length === 0) {
-            throw new Error('No valid data available for dataset5');
-          }
-
-          sangkats = [...new Set(datasets.dataset5.map(item => item.a3).filter(Boolean))];
-          validData = datasets.dataset5.filter(item => item.a3 && typeof item.count === 'number');
-
-          if (validData.length === 0) {
-            throw new Error('No valid data items after filtering for dataset5');
-          }
-
-          const totalCount = validData.reduce((sum, item) => sum + item.count, 0);
-
-          series = [{
-            name: 'Open Establishments',
-            type: 'bar',
-            data: sangkats.map(sangkat => {
-              const item = validData.find(d => d.a3 === sangkat);
-              return item ? item.count : 0;
-            }),
-            itemStyle: {
-              borderRadius: [0, 4, 4, 0],
-              borderColor: '#fff',
-              borderWidth: 1
-            },
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowColor: 'rgba(0, 0, 0, 0.2)'
-              }
-            },
-            label: {
-              show: true,
-              position: 'inside',
-              formatter: ({ value }) => (value > 0 ? value : ''),
-              fontSize: 10
-            },
-            animation: true,
-            animationDuration: 1000,
-            animationDelay: function (idx) {
-              return idx * 100; // Left-to-right animation
-            }
-          }];
-
-          chartTitle = 'Open Establishments by Sangkat';
-        } else if (selectedDataset === 'compare-dataset6') {
-          // Handle dataset6 (Registration Status by Sangkat)
-          if (!datasets?.dataset6 || !Array.isArray(datasets.dataset6) || datasets.dataset6.length === 0) {
-            throw new Error('No valid data available for dataset6');
-          }
-
-          sangkats = [...new Set(datasets.dataset6.map(item => item.a3).filter(Boolean))];
-          const registrationStatuses = [...new Set(datasets.dataset6.map(item => item.q7).filter(Boolean))].sort((a, b) => {
-            // Sort to ensure "Not Registered" stacks first (left), then "Registered" (right)
-            if (a === 'Not Registered') return -1;
-            if (b === 'Not Registered') return 1;
-            return a.localeCompare(b);
-          });
-          validData = datasets.dataset6.filter(item => item.a3 && item.q7 && typeof item.n === 'number' && typeof item.percent === 'number');
-
-          if (validData.length === 0) {
-            throw new Error('No valid data items after filtering for dataset6');
-          }
-
-          series = registrationStatuses.map(status => ({
-            name: status,
-            type: 'bar',
-            stack: 'total',
-            data: sangkats.map(sangkat => {
-              const item = validData.find(d => d.a3 === sangkat && d.q7 === status);
-              return item ? item.n : 0; // Use count (n) for bar height
-            }),
-            itemStyle: {
-              borderRadius: [0, 4, 4, 0],
-              borderColor: '#fff',
-              borderWidth: 1
-            },
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowColor: 'rgba(0, 0, 0, 0.2)'
-              }
-            },
-            label: {
-              show: true,
-              position: 'inside',
-              formatter: ({ value, dataIndex }) => {
-                const item = validData.find(d => d.a3 === sangkats[dataIndex] && d.q7 === status);
-                const percent = item ? item.percent.toFixed(2) : '0.00';
-                return value > 0 ? `${value} (${percent}%)` : '';
-              },
-              fontSize: 10
-            },
-            animation: true,
-            animationDuration: 1000,
-            animationDelay: function (idx) {
-              return idx * 100; // Left-to-right animation based on Sangkat index
-            }
-          }));
-
-          chartTitle = 'Registration Status by Sangkat';
-        } else {
-          throw new Error('Invalid dataset selected');
-        }
-
-        // Create or update chart container
-        let chartDiv = container.querySelector('div');
-        if (!chartDiv) {
-          container.innerHTML = '';
-          chartDiv = document.createElement('div');
-          chartDiv.className = 'w-full h-full';
-          container.appendChild(chartDiv);
-        }
-
-        // Initialize chart if not already done
-        if (!chart) {
-          chart = echarts.init(chartDiv, { renderer: 'svg' });
-
-          // Resize handling with controlled animation
-          let lastWidth = chartDiv.offsetWidth;
-          let lastHeight = chartDiv.offsetHeight;
-
-          const resizeObserver = new ResizeObserver(() => {
-            if (!chart || document.getElementById('section-2').classList.contains('hidden')) {
-              return;
-            }
-
-            const currentWidth = chartDiv.offsetWidth;
-            const currentHeight = chartDiv.offsetHeight;
-
-            if (currentWidth !== lastWidth || currentHeight !== lastHeight) {
-              chart.resize({
-                animation: {
-                  duration: 1000,
-                  easing: 'linear'
-                }
-              });
-              lastWidth = currentWidth;
-              lastHeight = currentHeight;
-            }
-          });
-          resizeObserver.observe(chartDiv);
-
-          // Clean up when container is removed
-          container.addEventListener('DOMNodeRemoved', () => {
-            resizeObserver.disconnect();
-            if (chart) {
-              chart.dispose();
-              chart = null;
-            }
-          });
-        }
-
-        // Calculate responsive font size and spacing
-        const isSmallScreen = window.innerWidth <= 640;
-        const titleFontSize = isSmallScreen ? 14 : 16;
-        const dataSourceFontSize = isSmallScreen ? 10 : 12;
-        const gridBottom = isSmallScreen ? '12%' : '10%';
-
-        const option = {
-          title: {
-            text: chartTitle,
-            left: 'center',
-            top: isSmallScreen ? 5 : 10,
-            bottom: 10,
-            textStyle: {
-              fontSize: titleFontSize,
-              fontWeight: 'bold',
-              color: '#333'
-            }
-          },
-          tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-              type: 'shadow'
-            },
-            formatter: params => {
-              const sangkat = sangkats[params[0].dataIndex];
-              let content = `<div class="font-medium">${sangkat}</div>`;
-              let total = 0;
-              params.forEach(param => {
-                if (param.value > 0) {
-                  let valueDisplay;
-                  if (selectedDataset === 'compare-dataset3') {
-                    valueDisplay = `${param.value}%`;
-                  } else if (selectedDataset === 'compare-dataset6') {
-                    const item = validData.find(d => d.a3 === sangkat && d.q7 === param.seriesName);
-                    const percent = item ? item.percent.toFixed(2) : '0.00';
-                    valueDisplay = `${param.value} (${percent}%)`;
-                  } else {
-                    valueDisplay = param.value;
-                  }
-                  total += parseFloat(param.value);
-                  content += `
-                    <div class="flex items-center">
-                      <span class="inline-block w-3 h-3 rounded-full mr-2" style="background:${param.color}"></span>
-                      <span>${param.seriesName}:</span>
-                      <span class="ml-auto pl-4">${valueDisplay}</span>
-                    </div>`;
-                }
-              });
-              if (selectedDataset !== 'compare-dataset5') {
-                content += `<div class="font-medium mt-1">Total: ${total}${selectedDataset === 'compare-dataset3' ? '%' : ''}</div>`;
-              }
-              return content;
-            },
-            backgroundColor: 'rgba(255, 255, 255, 0.96)',
-            borderWidth: 0,
-            extraCssText: 'box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); padding: 8px 12px; border-radius: 6px;'
-          },
-          legend: {
-            data: selectedDataset === 'compare-dataset3' 
-              ? [...new Set(datasets.dataset3.map(item => item.status).filter(Boolean))]
-              : selectedDataset === 'compare-dataset6'
-              ? [...new Set(datasets.dataset6.map(item => item.q7).filter(Boolean))].sort((a, b) => {
-                  if (a === 'Not Registered') return -1;
-                  if (b === 'Not Registered') return 1;
-                  return a.localeCompare(b);
-                })
-              : ['Open Establishments'],
-            bottom: 20,
-            textStyle: { fontSize: isSmallScreen ? 10 : 12 }
-          },
-          graphic: {
-            type: 'text',
-            left: 'center',
-            bottom: 0,
-            style: {
-              text: 'Data source: Cambodia Development Resource Institute',
-              font: `italic ${dataSourceFontSize}px 'Roboto', sans-serif`,
-              fill: '#4B5563',
-              textAlign: 'center'
-            }
-          },
-          xAxis: {
-            type: 'value',
-            axisLabel: {
-              formatter: selectedDataset === 'compare-dataset3' ? '{value}%' : '{value}',
-              fontSize: isSmallScreen ? 8 : 10
-            },
-            max: selectedDataset === 'compare-dataset3' ? 100 : null
-          },
-          yAxis: {
-            type: 'category',
-            data: sangkats,
-            axisLabel: { fontSize: isSmallScreen ? 8 : 10, margin: 8 },
-            axisTick: { alignWithLabel: true }
-          },
-          grid: {
-            left: isSmallScreen ? '8%' : '5%',
-            right: isSmallScreen ? '8%' : '5%',
-            bottom: gridBottom,
-            top: isSmallScreen ? '15%' : '10%',
-            containLabel: true
-          },
-          series: series,
-          animation: true,
-          animationDuration: 1000,
-          animationDurationUpdate: 1000,
-          animationEasing: 'linear',
-          animationDelay: function (idx) {
-            return idx * 100; // Left-to-right animation
-          },
-          animationDelayUpdate: function (idx) {
-            return idx * 100;
-          }
-        };
-
-        // Set chart options
-        chart.setOption(option, true);
-
-        // Force resize with animation
-        setTimeout(() => {
-          if (chart && !document.getElementById('section-2').classList.contains('hidden')) {
-            chart.resize({
-              animation: {
-                duration: 1000,
-                easing: 'linear'
-              }
-            });
-          }
-        }, 0);
-
-      } catch (error) {
-        console.error('Visualization error:', error);
-        container.innerHTML = `
-          <div class="text-center py-8">
-            <div class="text-red-500 mb-2">Error loading visualization</div>
-            <div class="text-gray-500 text-sm">${error.message}</div>
-          </div>`;
-      }
-    };
-
-    // Update showSection to handle chart rendering
-    function showSection(index) {
-      document.querySelectorAll('main section').forEach((sec, i) => {
-        sec.classList.toggle('hidden', i !== index);
-      });
-      document.querySelectorAll('aside button').forEach((btn, i) => {
-        btn.classList.toggle('active', i === index);
-      });
-
-      if (index === 2) {
-        setTimeout(() => {
-          renderSangkatStackedBarChart();
-          if (chart) {
-            chart.setOption(chart.getOption(), {
-              notMerge: true,
-              animation: true,
-              animationDuration: 1000,
-              animationEasing: 'linear'
-            });
-            chart.resize({
-              animation: {
-                duration: 1000,
-                easing: 'linear'
-              }
-            });
-          }
-        }, 0);
-      }
+  try {
+    if (!datasets || typeof datasets !== 'object') {
+      throw new Error('Datasets object is missing or invalid');
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      if (!document.getElementById('section-2').classList.contains('hidden')) {
-        renderSangkatStackedBarChart();
+    let data, sangkats, series, chartTitle, validData;
+    if (selectedDataset === 'compare-dataset3') {
+      // Handle dataset3 (Operating and Closed Establishments by Sangkat)
+      if (!datasets?.dataset3 || !Array.isArray(datasets.dataset3) || datasets.dataset3.length === 0) {
+        throw new Error('No valid data available for dataset3');
       }
 
-      const datasetSelect = document.getElementById('dataset-select');
-      if (datasetSelect) {
-        datasetSelect.addEventListener('change', () => {
-          renderSangkatStackedBarChart();
-          if (chart) {
-            chart.setOption(chart.getOption(), {
-              notMerge: true,
-              animation: true,
-              animationDuration: 1000,
-              animationEasing: 'linear'
-            });
-            chart.resize({
-              animation: {
-                duration: 1000,
-                easing: 'linear'
-              }
-            });
+      sangkats = [...new Set(datasets.dataset3.map(item => item.a3).filter(Boolean))];
+      const statuses = [...new Set(datasets.dataset3.map(item => item.status).filter(Boolean))];
+      validData = datasets.dataset3.filter(item => item.a3 && item.status && typeof item.percentage === 'number');
+
+      if (validData.length === 0) {
+        throw new Error('No valid data items after filtering for dataset3');
+      }
+
+      series = statuses.map(status => ({
+        name: status,
+        type: 'bar',
+        stack: 'total',
+        data: sangkats.map(sangkat => {
+          const item = validData.find(d => d.a3 === sangkat && d.status === status);
+          return item ? item.percentage : 0;
+        }),
+        itemStyle: {
+          borderRadius: [0, 4, 4, 0],
+          borderColor: '#fff',
+          borderWidth: 1
+        },
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowColor: 'rgba(0, 0, 0, 0.2)'
           }
+        },
+        label: {
+          show: true,
+          position: 'inside',
+          formatter: ({ value }) => (value > 5 ? `${value}%` : ''),
+          fontSize: 10
+        },
+        animation: !isIOS,
+        animationDuration: isIOS ? 0 : 1000,
+        animationDelay: isIOS ? () => 0 : (idx) => idx * 100
+      }));
+
+      chartTitle = 'Operating and Closed Establishments by Sangkat';
+    } else if (selectedDataset === 'compare-dataset5') {
+      // Handle dataset5 (Open Establishments by Sangkat)
+      if (!datasets?.dataset5 || !Array.isArray(datasets.dataset5) || datasets.dataset5.length === 0) {
+        throw new Error('No valid data available for dataset5');
+      }
+
+      sangkats = [...new Set(datasets.dataset5.map(item => item.a3).filter(Boolean))];
+      validData = datasets.dataset5.filter(item => item.a3 && typeof item.count === 'number');
+
+      if (validData.length === 0) {
+        throw new Error('No valid data items after filtering for dataset5');
+      }
+
+      const totalCount = validData.reduce((sum, item) => sum + item.count, 0);
+
+      series = [{
+        name: 'Open Establishments',
+        type: 'bar',
+        data: sangkats.map(sangkat => {
+          const item = validData.find(d => d.a3 === sangkat);
+          return item ? item.count : 0;
+        }),
+        itemStyle: {
+          borderRadius: [0, 4, 4, 0],
+          borderColor: '#fff',
+          borderWidth: 1
+        },
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowColor: 'rgba(0, 0, 0, 0.2)'
+          }
+        },
+        label: {
+          show: true,
+          position: 'inside',
+          formatter: ({ value }) => (value > 0 ? value : ''),
+          fontSize: 10
+        },
+        animation: !isIOS,
+        animationDuration: isIOS ? 0 : 1000,
+        animationDelay: isIOS ? () => 0 : (idx) => idx * 100
+      }];
+
+      chartTitle = 'Open Establishments by Sangkat';
+    } else if (selectedDataset === 'compare-dataset6') {
+      // Handle dataset6 (Registration Status by Sangkat)
+      if (!datasets?.dataset6 || !Array.isArray(datasets.dataset6) || datasets.dataset6.length === 0) {
+        throw new Error('No valid data available for dataset6');
+      }
+
+      sangkats = [...new Set(datasets.dataset6.map(item => item.a3).filter(Boolean))];
+      const registrationStatuses = [...new Set(datasets.dataset6.map(item => item.q7).filter(Boolean))].sort((a, b) => {
+        if (a === 'Not Registered') return -1;
+        if (b === 'Not Registered') return 1;
+        return a.localeCompare(b);
+      });
+      validData = datasets.dataset6.filter(item => item.a3 && item.q7 && typeof item.n === 'number' && typeof item.percent === 'number');
+
+      if (validData.length === 0) {
+        throw new Error('No valid data items after filtering for dataset6');
+      }
+
+      series = registrationStatuses.map(status => ({
+        name: status,
+        type: 'bar',
+        stack: 'total',
+        data: sangkats.map(sangkat => {
+          const item = validData.find(d => d.a3 === sangkat && d.q7 === status);
+          return item ? item.n : 0;
+        }),
+        itemStyle: {
+          borderRadius: [0, 4, 4, 0],
+          borderColor: '#fff',
+          borderWidth: 1
+        },
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowColor: 'rgba(0, 0, 0, 0.2)'
+          }
+        },
+        label: {
+          show: true,
+          position: 'inside',
+          formatter: ({ value, dataIndex }) => {
+            const item = validData.find(d => d.a3 === sangkats[dataIndex] && d.q7 === status);
+            const percent = item ? item.percent.toFixed(2) : '0.00';
+            return value > 0 ? `${value} (${percent}%)` : '';
+          },
+          fontSize: 10
+        },
+        animation: !isIOS,
+        animationDuration: isIOS ? 0 : 1000,
+        animationDelay: isIOS ? () => 0 : (idx) => idx * 100
+      }));
+
+      chartTitle = 'Registration Status by Sangkat';
+    } else {
+      throw new Error('Invalid dataset selected');
+    }
+
+    // Create or update chart container
+    let chartDiv = container.querySelector('div');
+    if (!chartDiv) {
+      container.innerHTML = '';
+      chartDiv = document.createElement('div');
+      chartDiv.className = 'w-full h-full';
+      container.appendChild(chartDiv);
+    }
+
+    // Initialize chart if not already done
+    if (!chart) {
+      chart = echarts.init(chartDiv, { renderer: 'svg' });
+
+      // Resize handling with controlled animation
+      let lastWidth = chartDiv.offsetWidth;
+      let lastHeight = chartDiv.offsetHeight;
+
+      const resizeObserver = new ResizeObserver(() => {
+        if (!chart || document.getElementById('section-2').classList.contains('hidden')) {
+          return;
+        }
+
+        const currentWidth = chartDiv.offsetWidth;
+        const currentHeight = chartDiv.offsetHeight;
+
+        if (currentWidth !== lastWidth || currentHeight !== lastHeight) {
+          chart.resize({
+            animation: { duration: isIOS ? 0 : 1000, easing: 'linear' }
+          });
+          lastWidth = currentWidth;
+          lastHeight = currentHeight;
+        }
+      });
+      resizeObserver.observe(chartDiv);
+
+      // Clean up when container is removed using MutationObserver
+      const mutationObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.removedNodes.length > 0 && chart) {
+            resizeObserver.disconnect();
+            chart.dispose();
+            chart = null;
+          }
+        });
+      });
+      mutationObserver.observe(container, { childList: true, subtree: true });
+    }
+
+    // Calculate responsive font size and spacing
+    const isSmallScreen = window.innerWidth <= 640;
+    const titleFontSize = isSmallScreen ? 14 : 16;
+    const dataSourceFontSize = isSmallScreen ? 10 : 12;
+    const gridBottom = isSmallScreen ? '12%' : '10%';
+
+    const option = {
+      title: {
+        text: chartTitle,
+        left: 'center',
+        top: isSmallScreen ? 5 : 10,
+        bottom: 10,
+        textStyle: {
+          fontSize: titleFontSize,
+          fontWeight: 'bold',
+          color: '#333'
+        }
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        triggerOn: 'mousemove|click|touchstart',
+        confine: true,
+        formatter: params => {
+          const sangkat = sangkats[params[0].dataIndex];
+          let content = `<div class="font-medium">${sangkat}</div>`;
+          let total = 0;
+          params.forEach(param => {
+            if (param.value > 0) {
+              let valueDisplay;
+              if (selectedDataset === 'compare-dataset3') {
+                valueDisplay = `${param.value}%`;
+              } else if (selectedDataset === 'compare-dataset6') {
+                const item = validData.find(d => d.a3 === sangkat && d.q7 === param.seriesName);
+                const percent = item ? item.percent.toFixed(2) : '0.00';
+                valueDisplay = `${param.value} (${percent}%)`;
+              } else {
+                valueDisplay = param.value;
+              }
+              total += parseFloat(param.value);
+              content += `
+                <div class="flex items-center">
+                  <span class="inline-block w-3 h-3 rounded-full mr-2" style="background:${param.color}"></span>
+                  <span>${param.seriesName}:</span>
+                  <span class="ml-auto pl-4">${valueDisplay}</span>
+                </div>`;
+            }
+          });
+          if (selectedDataset !== 'compare-dataset5') {
+            content += `<div class="font-medium mt-1">Total: ${total}${selectedDataset === 'compare-dataset3' ? '%' : ''}</div>`;
+          }
+          return content;
+        },
+        backgroundColor: 'rgba(255, 255, 255, 0.96)',
+        borderWidth: 0,
+        extraCssText: 'box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); padding: 8px 12px; border-radius: 6px;'
+      },
+      legend: {
+        data: selectedDataset === 'compare-dataset3'
+          ? [...new Set(datasets.dataset3.map(item => item.status).filter(Boolean))]
+          : selectedDataset === 'compare-dataset6'
+          ? [...new Set(datasets.dataset6.map(item => item.q7).filter(Boolean))].sort((a, b) => {
+              if (a === 'Not Registered') return -1;
+              if (b === 'Not Registered') return 1;
+              return a.localeCompare(b);
+            })
+          : ['Open Establishments'],
+        bottom: 20,
+        textStyle: { fontSize: isSmallScreen ? 10 : 12 }
+      },
+      graphic: {
+        type: 'text',
+        left: 'center',
+        bottom: 0,
+        style: {
+          text: 'Data source: Cambodia Development Resource Institute',
+          font: `italic ${dataSourceFontSize}px 'Roboto', sans-serif`,
+          fill: '#4B5563',
+          textAlign: 'center'
+        }
+      },
+      xAxis: {
+        type: 'value',
+        axisLabel: {
+          formatter: selectedDataset === 'compare-dataset3' ? '{value}%' : '{value}',
+          fontSize: isSmallScreen ? 8 : 10
+        },
+        max: selectedDataset === 'compare-dataset3' ? 100 : null
+      },
+      yAxis: {
+        type: 'category',
+        data: sangkats,
+        axisLabel: { fontSize: isSmallScreen ? 8 : 10, margin: 8 },
+        axisTick: { alignWithLabel: true }
+      },
+      grid: {
+        left: isSmallScreen ? '8%' : '5%',
+        right: isSmallScreen ? '8%' : '5%',
+        bottom: gridBottom,
+        top: isSmallScreen ? '15%' : '10%',
+        containLabel: true
+      },
+      series: series,
+      animation: !isIOS,
+      animationDuration: isIOS ? 0 : 1000,
+      animationDurationUpdate: isIOS ? 0 : 1000,
+      animationEasing: 'linear',
+      animationDelay: isIOS ? () => 0 : (idx) => idx * 100,
+      animationDelayUpdate: isIOS ? () => 0 : (idx) => idx * 100
+    };
+
+    // Set chart options
+    chart.setOption(option, true);
+
+    // Force resize with animation
+    setTimeout(() => {
+      if (chart && !document.getElementById('section-2').classList.contains('hidden')) {
+        chart.resize({
+          animation: { duration: isIOS ? 0 : 1000, easing: 'linear' }
+        });
+      }
+    }, 200); // Increased delay for iOS compatibility
+
+  } catch (error) {
+    console.error('Visualization error:', error);
+    container.innerHTML = `
+      <div class="text-center py-8">
+        <div class="text-red-500 mb-2">Error loading visualization</div>
+        <div class="text-gray-500 text-sm">${error.message}</div>
+      </div>`;
+    container.style.display = 'block'; // Ensure container is visible
+  }
+};
+
+// Update showSection to handle chart rendering
+function showSection(index) {
+  document.querySelectorAll('main section').forEach((sec, i) => {
+    sec.classList.toggle('hidden', i !== index);
+  });
+  document.querySelectorAll('aside button').forEach((btn, i) => {
+    btn.classList.toggle('active', i === index);
+  });
+
+  if (index === 2) {
+    waitForECharts(() => {
+      renderSangkatStackedBarChart();
+      if (chart) {
+        chart.setOption(chart.getOption(), {
+          notMerge: true,
+          animation: !(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream),
+          animationDuration: isIOS ? 0 : 1000,
+          animationEasing: 'linear'
+        });
+        chart.resize({
+          animation: { duration: isIOS ? 0 : 1000, easing: 'linear' }
         });
       }
     });
+  }
+}
 
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        if (chart && !document.getElementById('section-2').classList.contains('hidden')) {
+document.addEventListener('DOMContentLoaded', () => {
+  waitForECharts(() => {
+    if (!document.getElementById('section-2').classList.contains('hidden')) {
+      renderSangkatStackedBarChart();
+    }
+
+    const datasetSelect = document.getElementById('dataset-select');
+    if (datasetSelect) {
+      datasetSelect.addEventListener('change', () => {
+        waitForECharts(() => {
           renderSangkatStackedBarChart();
-          chart.resize({
-            animation: {
-              duration: 1000,
-              easing: 'linear'
-            }
-          });
-        }
-      }, 200);
-    });
+          if (chart) {
+            chart.setOption(chart.getOption(), {
+              notMerge: true,
+              animation: !(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream),
+              animationDuration: isIOS ? 0 : 1000,
+              animationEasing: 'linear'
+            });
+            chart.resize({
+              animation: { duration: isIOS ? 0 : 1000, easing: 'linear' }
+            });
+          }
+        });
+      });
+    }
+  });
+});
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (chart && !document.getElementById('section-2').classList.contains('hidden')) {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      if (isIOS) {
+        chart.dispose();
+        chart = null;
+        renderSangkatStackedBarChart();
+      } else {
+        renderSangkatStackedBarChart();
+        chart.resize({
+          animation: { duration: isIOS ? 0 : 1000, easing: 'linear' }
+        });
+      }
+    }
+  }, 200);
+});
+
+window.addEventListener('orientationchange', () => {
+  if (chart && !document.getElementById('section-2').classList.contains('hidden')) {
+    setTimeout(() => {
+      chart.resize({
+        animation: { duration: (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) ? 0 : 1000, easing: 'linear' }
+      });
+    }, 200);
+  }
+});
   </script>
 
 </body>
