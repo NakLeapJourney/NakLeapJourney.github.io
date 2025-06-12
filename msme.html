@@ -5304,24 +5304,31 @@ const waitForECharts = (callback) => {
   if (typeof echarts !== 'undefined') {
     callback();
   } else {
+    console.log('Waiting for ECharts to load...');
     setTimeout(() => waitForECharts(callback), 100);
   }
 };
 
 const renderSangkatStackedBarChart = () => {
   const container = document.getElementById('compare-bar-chart-status');
+  if (!container) {
+    console.error('Chart container not found');
+    return;
+  }
   const datasetSelect = document.getElementById('dataset-select');
-  const selectedDataset = datasetSelect.value; // Get selected dataset
+  const selectedDataset = datasetSelect ? datasetSelect.value : null;
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
   try {
     if (!datasets || typeof datasets !== 'object') {
       throw new Error('Datasets object is missing or invalid');
     }
+    if (!selectedDataset) {
+      throw new Error('No dataset selected');
+    }
 
-    let data, sangkats, series, chartTitle, validData;
+    let sangkats, series, chartTitle, validData;
     if (selectedDataset === 'compare-dataset3') {
-      // Handle dataset3 (Operating and Closed Establishments by Sangkat)
       if (!datasets?.dataset3 || !Array.isArray(datasets.dataset3) || datasets.dataset3.length === 0) {
         throw new Error('No valid data available for dataset3');
       }
@@ -5366,7 +5373,6 @@ const renderSangkatStackedBarChart = () => {
 
       chartTitle = 'Operating and Closed Establishments by Sangkat';
     } else if (selectedDataset === 'compare-dataset5') {
-      // Handle dataset5 (Open Establishments by Sangkat)
       if (!datasets?.dataset5 || !Array.isArray(datasets.dataset5) || datasets.dataset5.length === 0) {
         throw new Error('No valid data available for dataset5');
       }
@@ -5377,8 +5383,6 @@ const renderSangkatStackedBarChart = () => {
       if (validData.length === 0) {
         throw new Error('No valid data items after filtering for dataset5');
       }
-
-      const totalCount = validData.reduce((sum, item) => sum + item.count, 0);
 
       series = [{
         name: 'Open Establishments',
@@ -5411,7 +5415,6 @@ const renderSangkatStackedBarChart = () => {
 
       chartTitle = 'Open Establishments by Sangkat';
     } else if (selectedDataset === 'compare-dataset6') {
-      // Handle dataset6 (Registration Status by Sangkat)
       if (!datasets?.dataset6 || !Array.isArray(datasets.dataset6) || datasets.dataset6.length === 0) {
         throw new Error('No valid data available for dataset6');
       }
@@ -5479,41 +5482,46 @@ const renderSangkatStackedBarChart = () => {
     // Initialize chart if not already done
     if (!chart) {
       chart = echarts.init(chartDiv, { renderer: 'svg' });
+      console.log('Chart initialized');
+    }
 
-      // Resize handling with controlled animation
-      let lastWidth = chartDiv.offsetWidth;
-      let lastHeight = chartDiv.offsetHeight;
+    // Resize handling with controlled animation
+    let lastWidth = chartDiv.offsetWidth;
+    let lastHeight = chartDiv.offsetHeight;
 
-      const resizeObserver = new ResizeObserver(() => {
-        if (!chart || document.getElementById('section-2').classList.contains('hidden')) {
-          return;
-        }
+    const resizeObserver = new ResizeObserver(() => {
+      if (!chart || !container.offsetParent || document.getElementById('section-2').classList.contains('hidden')) {
+        return;
+      }
 
-        const currentWidth = chartDiv.offsetWidth;
-        const currentHeight = chartDiv.offsetHeight;
+      const currentWidth = chartDiv.offsetWidth;
+      const currentHeight = chartDiv.offsetHeight;
 
-        if (currentWidth !== lastWidth || currentHeight !== lastHeight) {
-          chart.resize({
-            animation: { duration: isIOS ? 0 : 1000, easing: 'linear' }
-          });
-          lastWidth = currentWidth;
-          lastHeight = currentHeight;
-        }
-      });
-      resizeObserver.observe(chartDiv);
+      if (currentWidth !== lastWidth || currentHeight !== lastHeight) {
+        console.log('Resizing chart:', { currentWidth, currentHeight });
+        chart.resize({
+          animation: { duration: isIOS ? 0 : 1000, easing: 'linear' }
+        });
+        lastWidth = currentWidth;
+        lastHeight = currentHeight;
+      }
+    });
+    resizeObserver.observe(chartDiv);
 
-      // Clean up when container is removed using MutationObserver
-      const mutationObserver = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.removedNodes.length > 0 && chart) {
-            resizeObserver.disconnect();
+    // Clean up only if container is removed
+    const mutationObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.removedNodes.length > 0 && !document.body.contains(container)) {
+          console.log('Container removed, cleaning up chart');
+          resizeObserver.disconnect();
+          if (chart) {
             chart.dispose();
             chart = null;
           }
-        });
+        }
       });
-      mutationObserver.observe(container, { childList: true, subtree: true });
-    }
+    });
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
 
     // Calculate responsive font size and spacing
     const isSmallScreen = window.innerWidth <= 640;
@@ -5536,7 +5544,7 @@ const renderSangkatStackedBarChart = () => {
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'shadow' },
-        triggerOn: 'mousemove|click|touchstart',
+        triggerOn: isIOS ? 'click' : 'mousemove|click|touchstart',
         confine: true,
         formatter: params => {
           const sangkat = sangkats[params[0].dataIndex];
@@ -5628,15 +5636,17 @@ const renderSangkatStackedBarChart = () => {
 
     // Set chart options
     chart.setOption(option, true);
+    console.log('Chart options set:', chartTitle);
 
     // Force resize with animation
     setTimeout(() => {
-      if (chart && !document.getElementById('section-2').classList.contains('hidden')) {
+      if (chart && container.offsetParent && !document.getElementById('section-2').classList.contains('hidden')) {
+        console.log('Forcing chart resize');
         chart.resize({
           animation: { duration: isIOS ? 0 : 1000, easing: 'linear' }
         });
       }
-    }, 200); // Increased delay for iOS compatibility
+    }, isIOS ? 300 : 200); // Increased delay for iOS
 
   } catch (error) {
     console.error('Visualization error:', error);
@@ -5645,15 +5655,13 @@ const renderSangkatStackedBarChart = () => {
         <div class="text-red-500 mb-2">Error loading visualization</div>
         <div class="text-gray-500 text-sm">${error.message}</div>
       </div>`;
-    container.style.display = 'block'; // Ensure container is visible
+    container.style.display = 'block';
   }
 };
 
 // Update showSection to handle chart rendering
 function showSection(index) {
-  document.querySelectorAll('main section').forEach((sec, i) => {
-    sec.classList.toggle('hidden', i !== index);
-  });
+  document.querySelectorAll('main section').for喧嘩聲色いっぱい
   document.querySelectorAll('aside button').forEach((btn, i) => {
     btn.classList.toggle('active', i === index);
   });
@@ -5661,7 +5669,8 @@ function showSection(index) {
   if (index === 2) {
     waitForECharts(() => {
       renderSangkatStackedBarChart();
-      if (chart) {
+      if (chart && !document.getElementById('section-2').classList.contains('hidden')) {
+        console.log('Section 2 shown, updating chart');
         chart.setOption(chart.getOption(), {
           notMerge: true,
           animation: !(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream),
@@ -5685,6 +5694,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const datasetSelect = document.getElementById('dataset-select');
     if (datasetSelect) {
       datasetSelect.addEventListener('change', () => {
+        console.log('Dataset selector changed:', datasetSelect.value);
         waitForECharts(() => {
           renderSangkatStackedBarChart();
           if (chart) {
@@ -5710,27 +5720,22 @@ window.addEventListener('resize', () => {
   resizeTimer = setTimeout(() => {
     if (chart && !document.getElementById('section-2').classList.contains('hidden')) {
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-      if (isIOS) {
-        chart.dispose();
-        chart = null;
-        renderSangkatStackedBarChart();
-      } else {
-        renderSangkatStackedBarChart();
-        chart.resize({
-          animation: { duration: isIOS ? 0 : 1000, easing: 'linear' }
-        });
-      }
+      console.log('Window resized, updating chart');
+      chart.resize({
+        animation: { duration: isIOS ? 0 : 1000, easing: 'linear' }
+      });
     }
-  }, 200);
+  }, 300);
 });
 
 window.addEventListener('orientationchange', () => {
   if (chart && !document.getElementById('section-2').classList.contains('hidden')) {
+    console.log('Orientation changed, resizing chart');
     setTimeout(() => {
       chart.resize({
         animation: { duration: (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) ? 0 : 1000, easing: 'linear' }
       });
-    }, 200);
+    }, 300);
   }
 });
   </script>
