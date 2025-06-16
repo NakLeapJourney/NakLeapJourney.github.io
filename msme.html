@@ -43,7 +43,7 @@
       display: flex;
     }
     #info-panel {
-      width: 33.33%;
+      width: 40%;
       background: white;
       border-right: 1px solid #e2e8f0;
       overflow-y: auto;
@@ -52,7 +52,7 @@
       z-index: 1100;
     }
     #map-container {
-      width: 66.67%;
+      width: 60%;
       position: relative;
     }
     #map-controls {
@@ -149,55 +149,44 @@
     </header>
 
     <div id="main-content">
-      <!-- Left Panel -->
-        <div id="info-panel" class="p-4 overflow-y-auto">
-        <h3 class="text-lg font-bold mb-4 text-[#336666]">MSME Overview</h3>
+    <!-- Left Panel -->
+    <div id="info-panel" class="p-4 overflow-y-auto flex flex-col gap-4">
+        <h3 class="text-lg font-bold text-[#336666]">MSME Overview</h3>
         
         <!-- Key Statistics Section -->
-        <div class="mb-6">
+        <div class="bg-white rounded-lg shadow-sm p-4">
             <h4 class="font-semibold mb-3 text-gray-700">Key Statistics</h4>
             <div class="grid grid-cols-2 gap-3">
-            <div class="bg-gray-50 p-3 rounded-lg shadow-sm">
-                <div class="text-xs text-gray-500 mb-1">Total Establishments</div>
-                <div class="text-xl font-bold text-gray-800" id="total-establishments">-</div>
-            </div>
-            <div class="bg-gray-50 p-3 rounded-lg shadow-sm">
-                <div class="text-xs text-gray-500 mb-1">New (12 months)</div>
-                <div class="text-xl font-bold text-gray-800" id="new-establishments">-</div>
-            </div>
-            <div class="bg-gray-50 p-3 rounded-lg shadow-sm">
-                <div class="text-xs text-gray-500 mb-1">Closed (12 months)</div>
-                <div class="text-xl font-bold text-gray-800" id="closed-establishments">-</div>
-            </div>
-            <div class="bg-gray-50 p-3 rounded-lg shadow-sm">
-                <div class="text-xs text-gray-500 mb-1">Avg. Age (years)</div>
-                <div class="text-xl font-bold text-gray-800" id="avg-age">-</div>
-            </div>
+                <div class="bg-gray-50 p-3 rounded-lg">
+                    <div class="text-xs text-gray-500 mb-1">Total Observations</div>
+                    <div class="text-xl font-bold text-gray-800" id="total-establishments">15,962</div>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-lg">
+                    <div class="text-xs text-gray-500 mb-1">Currently Operating Business</div>
+                    <div class="text-xl font-bold text-gray-800" id="total-establishments">14,820</div>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-lg">
+                    <div class="text-xs text-gray-500 mb-1">Newly Opening Business (12 months)</div>
+                    <div class="text-xl font-bold text-gray-800" id="new-establishments">1,790</div>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-lg">
+                    <div class="text-xs text-gray-500 mb-1">Closed Business(12 months)</div>
+                    <div class="text-xl font-bold text-gray-800" id="closed-establishments">1,142</div>
+                </div>
             </div>
         </div>
-        
-        <!-- Establishment Types Chart -->
-        <div class="mb-6">
-            <h4 class="font-semibold mb-3 text-gray-700">Establishment Types</h4>
-            <div id="type-chart" class="w-full h-48 bg-gray-50 rounded-lg p-2 shadow-sm"></div>
-        </div>
-        
-        <!-- Top Sangkats Section -->
-        <div class="mb-6">
-            <h4 class="font-semibold mb-3 text-gray-700">Top Sangkats</h4>
-            <div class="space-y-2">
-            <div class="flex justify-between items-center text-sm bg-gray-50 px-3 py-2 rounded-lg">
-                <span id="top-sangkat-1" class="font-medium">-</span>
-                <span id="top-sangkat-1-value" class="text-gray-600">-</span>
+
+        <!-- Dataset Visualization -->
+        <div class="bg-white rounded-lg shadow-sm flex-1 flex flex-col">
+            <div class="p-4 border-b">
+                <select id="dataset-select" class="w-full px-3 py-2 border rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="compare-dataset3">Operating and Closed Establishments by Sangkat</option>
+                    <option value="compare-dataset5">Open Establishments by Sangkat</option>
+                    <option value="compare-dataset6">Registration Status by Sangkat</option>
+                </select>
             </div>
-            <div class="flex justify-between items-center text-sm bg-gray-50 px-3 py-2 rounded-lg">
-                <span id="top-sangkat-2" class="font-medium">-</span>
-                <span id="top-sangkat-2-value" class="text-gray-600">-</span>
-            </div>
-            <div class="flex justify-between items-center text-sm bg-gray-50 px-3 py-2 rounded-lg">
-                <span id="top-sangkat-3" class="font-medium">-</span>
-                <span id="top-sangkat-3-value" class="text-gray-600">-</span>
-            </div>
+            <div class="p-4 flex-1">
+                <div id="compare-bar-chart-status" class="w-full h-full min-h-[300px]"></div>
             </div>
         </div>
         
@@ -205,7 +194,7 @@
         <div class="text-xs text-gray-500 italic pt-2 border-t border-gray-100">
             <p>Data source: Cambodia Development Resource Institute</p>
         </div>
-        </div>
+    </div>
       
       <!-- Overlay for mobile -->
       <div id="panel-overlay" class="panel-overlay"></div>
@@ -279,7 +268,9 @@
           </div>
         </div>
       </div>
-      <p class="text-center text-gray-600 italic">Data source: Cambodia Development Resource Institute</p>
+      <div class="text-center text-xs text-gray-500 italic pt-2 border-t border-gray-100">
+        <p>Data source: Cambodia Development Resource Institute</p>
+      </div>
     </div>
   </div>
 
@@ -4884,126 +4875,7 @@
           };
         }
       };
-
-      const updateInfoPanel = () => {
-        // Calculate summary statistics
-        const allData = datasets.dataset3 || [];
-        const typeData = datasets.dataset4 || [];
-        
-        // Total establishments
-        const totalEst = allData.reduce((sum, d) => sum + d.count, 0);
-        document.getElementById('total-establishments').textContent = totalEst.toLocaleString();
-        
-        // New establishments (last 12 months)
-        const newEst = (datasets.dataset1 || [])
-          .filter(d => d.status === "New")
-          .reduce((sum, d) => sum + d.count, 0);
-        document.getElementById('new-establishments').textContent = newEst.toLocaleString();
-        
-        // Closed establishments (last 12 months)
-        const closedEst = (datasets.dataset1 || [])
-          .filter(d => d.status === "Closed")
-          .reduce((sum, d) => sum + d.count, 0);
-        document.getElementById('closed-establishments').textContent = closedEst.toLocaleString();
-        
-        // Average age (placeholder)
-        document.getElementById('avg-age').textContent = "3.5";
-        
-        // Top Sangkats
-        const sangkatData = {};
-        districtsGeoJSON.features.forEach(feature => {
-          const name = feature.properties.name;
-          const count = (datasets.dataset2 || [])
-            .filter(d => d.a3 === name)
-            .reduce((sum, d) => sum + d.est_count, 0);
-          sangkatData[name] = count;
-        });
-        
-        const sortedSangkats = Object.entries(sangkatData)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 3);
-        
-        for (let i = 0; i < 3; i++) {
-          const el = document.getElementById(`top-sangkat-${i+1}`);
-          const valEl = document.getElementById(`top-sangkat-${i+1}-value`);
-          if (sortedSangkats[i]) {
-            el.textContent = sortedSangkats[i][0];
-            valEl.textContent = sortedSangkats[i][1].toLocaleString();
-          } else {
-            el.textContent = "-";
-            valEl.textContent = "-";
-          }
-        }
-        
-        // Update type chart
-        renderTypeChart();
-      };
       
-      const renderTypeChart = () => {
-        const container = document.getElementById('type-chart');
-        if (typeChart) {
-          typeChart.dispose();
-          typeChart = null;
-        }
-        container.innerHTML = '';
-        
-        const typeData = datasets.dataset4 || [];
-        if (typeData.length === 0) {
-          container.innerHTML = '<p class="text-gray-500 text-center py-8">No type data available</p>';
-          return;
-        }
-        
-        const typeCounts = {};
-        typeData.forEach(item => {
-          if (!typeCounts[item.type]) typeCounts[item.type] = 0;
-          typeCounts[item.type] += item.count;
-        });
-        
-        const sortedTypes = Object.entries(typeCounts)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 5); // Show top 5 types
-        
-        typeChart = echarts.init(container, { renderer: 'svg' });
-        
-        const option = {
-          tooltip: {
-            trigger: 'item',
-            formatter: '{b}: {c} ({d}%)'
-          },
-          series: [{
-            name: 'Establishment Types',
-            type: 'pie',
-            radius: ['40%', '70%'],
-            avoidLabelOverlap: false,
-            itemStyle: {
-              borderRadius: 10,
-              borderColor: '#fff',
-              borderWidth: 2
-            },
-            label: {
-              show: false,
-              position: 'center'
-            },
-            emphasis: {
-              label: {
-                show: true,
-                fontSize: '14',
-                fontWeight: 'bold'
-              }
-            },
-            labelLine: {
-              show: false
-            },
-            data: sortedTypes.map(([name, value]) => ({
-              value,
-              name
-            }))
-          }]
-        };
-        
-        typeChart.setOption(option);
-      };
-
       const renderPieChartStatus = (districtName) => {
         const chartData = (datasets.dataset3 || []).filter(item => item.a3 === districtName);
         const container = document.getElementById('pie-chart-status');
@@ -5496,7 +5368,6 @@
 
       new ResizeObserver(() => map.invalidateSize()).observe(document.getElementById('leaflet-map'));
       updateTimeSlider();
-      updateInfoPanel();
 
       // Close modal when clicking outside the modal content
       document.getElementById('map-modal').addEventListener('click', function(e) {
@@ -5526,6 +5397,368 @@
       });
     });
   </script>
+    
+    <script>
+        let chart = null; // Cache the chart instance
+        let resizeObserver = null; // Cache the resize observer
+        let isInitialResize = true; // Flag to skip initial ResizeObserver callback
 
+        const renderSangkatStackedBarChart = () => {
+            const container = document.getElementById('compare-bar-chart-status');
+            if (!container) return; // Exit if container doesn't exist
+
+            const datasetSelect = document.getElementById('dataset-select');
+            const selectedDataset = datasetSelect ? datasetSelect.value : 'compare-dataset3'; // Default to dataset3 if select not found
+
+            try {
+                if (typeof echarts === 'undefined') {
+                    throw new Error('ECharts library not loaded');
+                }
+
+                let data, sangkats, series, chartTitle, validData;
+                if (selectedDataset === 'compare-dataset3') {
+                    // Handle dataset3 (Operating and Closed Establishments by Sangkat)
+                    if (!datasets?.dataset3 || !Array.isArray(datasets.dataset3) || datasets.dataset3.length === 0) {
+                        throw new Error('No valid data available for dataset3');
+                    }
+
+                    sangkats = [...new Set(datasets.dataset3.map(item => item.a3).filter(Boolean))];
+                    const statuses = [...new Set(datasets.dataset3.map(item => item.status).filter(Boolean))];
+                    validData = datasets.dataset3.filter(item => item.a3 && item.status && typeof item.percentage === 'number');
+
+                    if (validData.length === 0) {
+                        throw new Error('No valid data items after filtering for dataset3');
+                    }
+
+                    series = statuses.map((status, seriesIndex) => ({
+                        name: status,
+                        type: 'bar',
+                        stack: 'total',
+                        data: sangkats.map(sangkat => {
+                            const item = validData.find(d => d.a3 === sangkat && d.status === status);
+                            return item ? item.percentage : 0;
+                        }),
+                        itemStyle: {
+                            borderRadius: [0, 4, 4, 0],
+                            borderColor: '#fff',
+                            borderWidth: 1
+                        },
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowColor: 'rgba(0, 0, 0, 0.2)'
+                            }
+                        },
+                        label: {
+                            show: true,
+                            position: 'inside',
+                            formatter: ({ value }) => (value > 5 ? `${value}%` : ''),
+                            fontSize: 10
+                        },
+                        animation: true,
+                        animationDuration: 2000, // Increased for slower animation
+                        animationDelay: (idx, seriesIdx = seriesIndex) => idx * 100 + seriesIdx * 300, // Stagger by sangkat and series for stack effect
+                        animationDurationUpdate: 1000, // Slower update animation
+                        animationEasing: 'cubicOut' // Smoother easing for stacking
+                    }));
+
+                    chartTitle = 'Operating and Closed Establishments by Sangkat';
+                } else if (selectedDataset === 'compare-dataset5') {
+                    // Handle dataset5 (Open Establishments by Sangkat)
+                    if (!datasets?.dataset5 || !Array.isArray(datasets.dataset5) || datasets.dataset5.length === 0) {
+                        throw new Error('No valid data available for dataset5');
+                    }
+
+                    sangkats = [...new Set(datasets.dataset5.map(item => item.a3).filter(Boolean))];
+                    validData = datasets.dataset5.filter(item => item.a3 && typeof item.count === 'number');
+
+                    if (validData.length === 0) {
+                        throw new Error('No valid data items after filtering for dataset5');
+                    }
+
+                    series = [{
+                        name: 'Open Establishments',
+                        type: 'bar',
+                        data: sangkats.map(sangkat => {
+                            const item = validData.find(d => d.a3 === sangkat);
+                            return item ? item.count : 0;
+                        }),
+                        itemStyle: {
+                            borderRadius: [0, 4, 4, 0],
+                            borderColor: '#fff',
+                            borderWidth: 1
+                        },
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowColor: 'rgba(0, 0, 0, 0.2)'
+                            }
+                        },
+                        label: {
+                            show: true,
+                            position: 'inside',
+                            formatter: ({ value }) => (value > 0 ? value : ''),
+                            fontSize: 10
+                        },
+                        animation: true,
+                        animationDuration: 2000, // Increased for slower animation
+                        animationDelay: idx => idx * 100, // Stagger by sangkat
+                        animationDurationUpdate: 1000, // Slower update animation
+                        animationEasing: 'cubicOut' // Smoother easing
+                    }];
+
+                    chartTitle = 'Open Establishments by Sangkat';
+                } else if (selectedDataset === 'compare-dataset6') {
+                    // Handle dataset6 (Registration Status by Sangkat)
+                    if (!datasets?.dataset6 || !Array.isArray(datasets.dataset6) || datasets.dataset6.length === 0) {
+                        throw new Error('No valid data available for dataset6');
+                    }
+
+                    sangkats = [...new Set(datasets.dataset6.map(item => item.a3).filter(Boolean))];
+                    const registrationStatuses = [...new Set(datasets.dataset6.map(item => item.q7).filter(Boolean))].sort((a, b) => {
+                        if (a === 'Not Registered') return -1;
+                        if (b === 'Not Registered') return 1;
+                        return a.localeCompare(b);
+                    });
+                    validData = datasets.dataset6.filter(item => item.a3 && item.q7 && typeof item.n === 'number' && typeof item.percent === 'number');
+
+                    if (validData.length === 0) {
+                        throw new Error('No valid data items after filtering for dataset6');
+                    }
+
+                    series = registrationStatuses.map((status, seriesIndex) => ({
+                        name: status,
+                        type: 'bar',
+                        stack: 'total',
+                        data: sangkats.map(sangkat => {
+                            const item = validData.find(d => d.a3 === sangkat && d.q7 === status);
+                            return item ? item.n : 0;
+                        }),
+                        itemStyle: {
+                            borderRadius: [0, 4, 4, 0],
+                            borderColor: '#fff',
+                            borderWidth: 1
+                        },
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowColor: 'rgba(0, 0, 0, 0.2)'
+                            }
+                        },
+                        label: {
+                            show: true,
+                            position: 'inside',
+                            formatter: ({ value, dataIndex }) => {
+                                const item = validData.find(d => d.a3 === sangkats[dataIndex] && d.q7 === status);
+                                const percent = item ? item.percent.toFixed(2) : '0.00';
+                                return value > 0 ? `${value} (${percent}%)` : '';
+                            },
+                            fontSize: 10
+                        },
+                        animation: true,
+                        animationDuration: 2000, // Increased for slower animation
+                        animationDelay: (idx, seriesIdx = seriesIndex) => idx * 100 + seriesIdx * 300, // Stagger by sangkat and series for stack effect
+                        animationDurationUpdate: 1000, // Slower update animation
+                        animationEasing: 'cubicOut' // Smoother easing for stacking
+                    }));
+
+                    chartTitle = 'Registration Status by Sangkat';
+                } else {
+                    throw new Error('Invalid dataset selected');
+                }
+
+                // Create or update chart container
+                let chartDiv = container.querySelector('div');
+                if (!chartDiv) {
+                    container.innerHTML = '';
+                    chartDiv = document.createElement('div');
+                    chartDiv.className = 'w-full h-full min-h-[400px]';
+                    container.appendChild(chartDiv);
+                }
+
+                // Initialize chart if not already done
+                if (!chart) {
+                    chart = echarts.init(chartDiv, null, { renderer: 'svg' });
+                    // Set up resize observer for the container
+                    resizeObserver = new ResizeObserver(() => {
+                        if (chart && container.offsetParent !== null) {
+                            if (isInitialResize) {
+                                // Skip the initial ResizeObserver callback to avoid disabling animations
+                                isInitialResize = false;
+                                return;
+                            }
+                            // Call resize with animation options to preserve animations
+                            chart.resize({
+                                animation: {
+                                    duration: 1000, // Match update animation duration
+                                    easing: 'cubicOut'
+                                }
+                            });
+                        }
+                    });
+                    resizeObserver.observe(container);
+                }
+
+                // Calculate responsive settings
+                const isSmallScreen = window.innerWidth <= 640;
+                const titleFontSize = isSmallScreen ? 14 : 16;
+                const labelFontSize = isSmallScreen ? 8 : 10;
+                const legendFontSize = isSmallScreen ? 10 : 12;
+                const gridBottom = isSmallScreen ? '15%' : '10%';
+                const gridTop = isSmallScreen ? '20%' : '15%';
+
+                const option = {
+                    title: {
+                        text: chartTitle,
+                        left: 'center',
+                        top: 10,
+                        textStyle: {
+                            fontSize: titleFontSize,
+                            fontWeight: 'bold',
+                            color: '#333'
+                        }
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: { type: 'shadow' },
+                        formatter: params => {
+                            const sangkat = sangkats[params[0].dataIndex];
+                            let content = `<div class="font-medium">${sangkat}</div>`;
+                            let total = 0;
+                            params.forEach(param => {
+                                if (param.value > 0) {
+                                    let valueDisplay;
+                                    if (selectedDataset === 'compare-dataset3') {
+                                        valueDisplay = `${param.value}%`;
+                                    } else if (selectedDataset === 'compare-dataset6') {
+                                        const item = validData.find(d => d.a3 === sangkat && d.q7 === param.seriesName);
+                                        const percent = item ? item.percent.toFixed(2) : '0.00';
+                                        valueDisplay = `${param.value} (${percent}%)`;
+                                    } else {
+                                        valueDisplay = param.value;
+                                    }
+                                    total += parseFloat(param.value);
+                                    content += `
+                                        <div class="flex items-center">
+                                        <span class="inline-block w-3 h-3 rounded-full mr-2" style="background:${param.color}"></span>
+                                        <span>${param.seriesName}:</span>
+                                        <span class="ml-auto pl-4">${valueDisplay}</span>
+                                        </div>`;
+                                }
+                            });
+                            if (selectedDataset !== 'compare-dataset5') {
+                                content += `<div class="font-medium mt-1">Total: ${total}${selectedDataset === 'compare-dataset3' ? '%' : ''}</div>`;
+                            }
+                            return content;
+                        },
+                        backgroundColor: 'rgba(255, 255, 255, 0.96)',
+                        borderWidth: 0,
+                        extraCssText: 'box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); padding: 8px 12px; border-radius: 6px;'
+                    },
+                    legend: {
+                        data: series.map(s => s.name),
+                        bottom: 0,
+                        textStyle: { fontSize: legendFontSize }
+                    },
+                    xAxis: {
+                        type: 'value',
+                        axisLabel: {
+                            formatter: selectedDataset === 'compare-dataset3' ? '{value}%' : '{value}',
+                            fontSize: labelFontSize
+                        },
+                        max: selectedDataset === 'compare-dataset3' ? 100 : null
+                    },
+                    yAxis: {
+                        type: 'category',
+                        data: sangkats,
+                        axisLabel: { 
+                            fontSize: labelFontSize, 
+                            margin: 8,
+                            interval: 0
+                        },
+                        axisTick: { alignWithLabel: true }
+                    },
+                    grid: {
+                        left: '5%',
+                        right: '5%',
+                        bottom: gridBottom,
+                        top: gridTop,
+                        containLabel: true
+                    },
+                    series: series,
+                    animation: true,
+                    animationDuration: 2000, // Slower animation for initial render
+                    animationEasing: 'cubicOut', // Smoother easing for stacking
+                    animationThreshold: 10000,
+                    animationDurationUpdate: 1000, // Slower animation for updates
+                    animationEasingUpdate: 'cubicOut' // Match easing for updates
+                };
+
+                // Set chart options with notMerge: true to restart animations
+                chart.setOption(option, { notMerge: true });
+
+                // Force initial resize with animation options after a short delay
+                setTimeout(() => {
+                    if (chart && container.offsetParent !== null) {
+                        chart.resize({
+                            animation: {
+                                duration: 1000,
+                                easing: 'cubicOut'
+                            }
+                        });
+                    }
+                    isInitialResize = false; // Ensure subsequent resizes are processed
+                }, 100);
+
+            } catch (error) {
+                console.error('Visualization error:', error);
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="text-red-500 mb-2">Error loading visualization</div>
+                        <div class="text-gray-500 text-sm">${error.message}</div>
+                    </div>`;
+                
+                if (chart) {
+                    chart.dispose();
+                    chart = null;
+                }
+            }
+        };
+
+        // Clean up when the page unloads
+        window.addEventListener('beforeunload', () => {
+            if (resizeObserver) {
+                resizeObserver.disconnect();
+            }
+            if (chart) {
+                chart.dispose();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSangkatStackedBarChart();
+
+            const datasetSelect = document.getElementById('dataset-select');
+            if (datasetSelect) {
+                datasetSelect.addEventListener('change', renderSangkatStackedBarChart);
+            }
+        });
+
+        // Optimized resize handler with debouncing
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                if (chart) {
+                    chart.resize({
+                        animation: {
+                            duration: 1000,
+                            easing: 'cubicOut'
+                        }
+                    });
+                }
+            }, 200);
+        });
+    </script>
 </body>
 </html>
