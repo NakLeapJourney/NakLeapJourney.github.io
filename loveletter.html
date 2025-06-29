@@ -23,32 +23,57 @@
       cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path fill='%23ff9999' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>"), auto;
     }
 
-    /* Floating hearts and sparkles animations */
+    /* Enhanced floating hearts animation */
     @keyframes float-heart {
-      0% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
-      50% { transform: translateY(-30px) rotate(5deg); opacity: 0.8; }
-      100% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+      0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.8; }
+      50% { transform: translateY(-40px) rotate(10deg) scale(1.1); opacity: 1; }
+      100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.8; }
     }
+    
+    @keyframes float-heart-2 {
+      0% { transform: translateY(0) rotate(10deg) scale(1); opacity: 0.7; }
+      50% { transform: translateY(-50px) rotate(-10deg) scale(1.2); opacity: 0.9; }
+      100% { transform: translateY(0) rotate(10deg) scale(1); opacity: 0.7; }
+    }
+    
+    @keyframes float-heart-3 {
+      0% { transform: translateY(0) rotate(-5deg) scale(1); opacity: 0.6; }
+      50% { transform: translateY(-60px) rotate(5deg) scale(1.3); opacity: 0.8; }
+      100% { transform: translateY(0) rotate(-5deg) scale(1); opacity: 0.6; }
+    }
+    
     @keyframes sparkle {
       0% { opacity: 0; transform: scale(0.5); }
-      50% { opacity: 0.7; transform: scale(1); }
+      50% { opacity: 0.9; transform: scale(1.2); }
       100% { opacity: 0; transform: scale(0.5); }
     }
+    
     .floating-heart {
       position: absolute;
-      animation: float-heart 6s ease-in-out infinite;
-      opacity: 0.6;
+      animation: float-heart 8s ease-in-out infinite;
+      opacity: 0.8;
       pointer-events: none;
       z-index: 1;
+      text-shadow: 0 0 10px rgba(255, 153, 153, 0.5);
     }
+    
+    .floating-heart.type-2 {
+      animation: float-heart-2 10s ease-in-out infinite;
+    }
+    
+    .floating-heart.type-3 {
+      animation: float-heart-3 12s ease-in-out infinite;
+    }
+    
     .sparkle {
       position: absolute;
-      animation: sparkle 2s ease-in-out infinite;
+      animation: sparkle 1.5s ease-in-out infinite;
       opacity: 0;
       pointer-events: none;
       z-index: 1;
     }
 
+    /* Rest of your existing CSS remains the same */
     #envelope {
       position: relative;
       width: 280px;
@@ -59,7 +84,7 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
       cursor: pointer;
       margin: 20px 0;
-      z-index: 2; /* Ensure envelope is above background effects */
+      z-index: 2;
     }
 
     .front {
@@ -380,7 +405,7 @@
     .kawaii-cloud {
       position: absolute;
       font-size: 2.5rem;
-      color: #ff85a2; /* Soft pink color */
+      color: #ff85a2;
       opacity: 0.7;
       z-index: 0;
       pointer-events: none;
@@ -451,11 +476,12 @@
         As the sun rises each morning, all I can think of is you.
       </p>
       <p>
-        I get lost in your eyes and love the sound of your laughter. 
-        Every moment with you feels like part of a wonderful story.
+        I find myself lost in the poetry of your eyes and the melody of your laughter. 
+        Each moment with you is a verse in our beautiful love story.
       </p>
       <p>
-        You are always there for me, and I am always here for you.
+        Like the moon pulls the tides, you pull at my heart with a force I cannot resist. 
+        You are my constant, my true north in this vast universe.
       </p>
       <div class="signature">Forever Yours</div>
       <div class="date">June 29, 2025</div>
@@ -464,54 +490,76 @@
 
   <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js'></script>
   <script>
-    // Create floating hearts in background
+    // Enhanced heart creation with more variety
     function createHearts() {
       const container = document.getElementById('hearts-container');
-      const colors = ['#ff9999', '#f9c5c8', '#fd8787', '#ffb6c1', '#d23669'];
+      const colors = ['#ff9999', '#ff6b6b', '#ff3333', '#ffb6c1', '#fd8787', '#d23669', '#ff85a2'];
+      const types = ['♥', '❤', '💖', '💗', '💓', '💘'];
       
-      for (let i = 0; i < 10; i++) { // Reduced number for subtlety
+      // Create 24 hearts (reduced from 30)
+      for (let i = 0; i < 24; i++) {
         const heart = document.createElement('div');
-        heart.className = 'floating-heart';
-        heart.innerHTML = '♥';
+        heart.className = `floating-heart type-${Math.floor(Math.random() * 3) + 1}`;
+        heart.innerHTML = types[Math.floor(Math.random() * types.length)];
+        
+        // Random positioning
         heart.style.left = Math.random() * 100 + 'vw';
         heart.style.top = Math.random() * 100 + 'vh';
-        heart.style.fontSize = Math.random() * 15 + 10 + 'px';
-        heart.style.animationDelay = Math.random() * 4 + 's';
+        
+        // Larger size range (15px to 35px)
+        heart.style.fontSize = Math.random() * 20 + 15 + 'px';
+        
+        // Random animation delay
+        heart.style.animationDelay = Math.random() * 5 + 's';
+        
+        // More vivid colors
         heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+        heart.style.opacity = 0.7 + Math.random() * 0.3; // 0.7 to 1 opacity
+        
+        // Add subtle glow
+        heart.style.textShadow = `0 0 ${Math.random() * 10 + 5}px ${colors[Math.floor(Math.random() * colors.length)]}`;
         
         container.appendChild(heart);
       }
     }
-
-    // Create sparkle effects
+    // Enhanced sparkle effects
     function createSparkles(count, x, y) {
+      const sparkleChars = ['✧', '✦', '✶', '✺', '✹', '❀', '✼'];
+      
       for (let i = 0; i < count; i++) {
         const sparkle = document.createElement('div');
         sparkle.className = 'sparkle';
-        sparkle.innerHTML = '✧';
+        sparkle.innerHTML = sparkleChars[Math.floor(Math.random() * sparkleChars.length)];
+        
+        // Position either random or at specified coordinates
         sparkle.style.left = (x ? x : Math.random() * 100) + (x ? 'px' : 'vw');
         sparkle.style.top = (y ? y : Math.random() * 100) + (y ? 'px' : 'vh');
-        sparkle.style.fontSize = Math.random() * 10 + 10 + 'px';
+        
+        // Larger sparkles
+        sparkle.style.fontSize = Math.random() * 15 + 15 + 'px';
         sparkle.style.animationDelay = Math.random() * 1 + 's';
-        sparkle.style.color = '#ff9999';
+        
+        // More colorful sparkles
+        const colors = ['#ff9999', '#ffcc99', '#ffff99', '#99ff99', '#9999ff', '#ff99ff'];
+        sparkle.style.color = colors[Math.floor(Math.random() * colors.length)];
         
         document.body.appendChild(sparkle);
         
         // Remove sparkle after animation
         setTimeout(() => {
           sparkle.remove();
-        }, 2000);
+        }, 1500);
       }
     }
 
-    // Periodic sparkles (less frequent)
+    // More frequent sparkles (but still subtle)
     setInterval(() => {
-      createSparkles(1);
-    }, 3000); // Increased interval for calm effect
+      createSparkles(2); // Create 2 sparkles at a time
+    }, 2000);
 
-    // Mouse-triggered sparkles (less frequent)
+    // Mouse-triggered sparkles (more responsive)
     document.addEventListener('mousemove', (e) => {
-      if (Math.random() > 0.9) { // Reduced probability
+      if (Math.random() > 0.7) { // 30% chance to create sparkles on mouse move
         createSparkles(1, e.pageX, e.pageY);
       }
     });
@@ -520,7 +568,7 @@
     window.addEventListener('load', () => {
       createHearts();
       setTimeout(() => {
-        createSparkles(5); // Initial sparkles
+        createSparkles(8); // Initial sparkles burst
       }, 500);
     });
 
