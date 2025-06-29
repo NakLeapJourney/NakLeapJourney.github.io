@@ -415,26 +415,6 @@
             }
         }
 
-        /* Music control button */
-        #playMusicBtn {
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            z-index: 1000;
-            background: rgba(231, 84, 136, 0.9);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .map-title h1 {
@@ -496,14 +476,6 @@
                 height: 30px;
                 font-size: 16px;
             }
-            
-            #playMusicBtn {
-                width: 40px;
-                height: 40px;
-                font-size: 16px;
-                bottom: 70px;
-                right: 15px;
-            }
         }
     </style>
 </head>
@@ -524,6 +496,12 @@
         <span id="memory-count"></span> Memories
     </div>
 
+    <!-- Background Music (hidden, autoplay) -->
+    <audio id="bgMusic" loop autoplay>
+        <source src="your-music-file.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
     <!-- Modal Overlay -->
     <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
         <div class="memory-modal" role="document">
@@ -539,16 +517,6 @@
 
     <!-- Floating hearts container -->
     <div class="hearts-container"></div>
-
-    <!-- Background Music -->
-    <audio id="bgMusic" loop>
-        <source src="10000.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
-
-    <button id="playMusicBtn" aria-label="Play background music">
-        <i class="fas fa-music"></i>
-    </button>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
@@ -969,6 +937,7 @@
                   .join('')}
               </div>
             </div>
+            <div class="memory-description">${memory.description}</div>
           `;
           
           // Set modal title
@@ -1085,29 +1054,13 @@
           }
         });
 
-        // Background music control
+        // Background Music - autoplay at 30% volume
         const bgMusic = document.getElementById('bgMusic');
-        const playMusicBtn = document.getElementById('playMusicBtn');
+        bgMusic.volume = 0.3; // Set volume to 30%
         
-        // Try to play music when page loads (many browsers block autoplay)
-        document.addEventListener('DOMContentLoaded', function() {
-            // Try to play music automatically
-            const playPromise = bgMusic.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    // Autoplay was prevented, show play button
-                    playMusicBtn.style.display = 'flex';
-                    
-                    playMusicBtn.addEventListener('click', () => {
-                        bgMusic.play();
-                        playMusicBtn.style.display = 'none';
-                    });
-                }).then(() => {
-                    // Autoplay worked, hide button
-                    playMusicBtn.style.display = 'none';
-                });
-            }
+        // Try to autoplay (may be blocked by browser)
+        bgMusic.play().catch(e => {
+            console.log("Autoplay was prevented:", e);
         });
     </script>
 </body>
