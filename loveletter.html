@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Love Letter</title>
+    <style>
+        body {
+            font-family: 'Brush Script MT', cursive;
+            background-color: #ffebee;
+            color: #d32f2f;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background-image: url('https://i.pinimg.com/originals/0f/4a/8e/0f4a8e7f2a7a9c0e2e8d3a9e3c3e3e3e.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+        }
+        
+        .letter-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            border: 2px solid #f8bbd0;
+        }
+        
+        h1 {
+            color: #c2185b;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        
+        .letter-content {
+            font-size: 1.5em;
+            line-height: 1.6;
+            text-align: left;
+            padding: 0 20px;
+        }
+        
+        .signature {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2em;
+            margin-top: 30px;
+            text-align: right;
+        }
+        
+        .heart-image {
+            max-width: 300px;
+            margin: 20px auto;
+            border-radius: 10px;
+            border: 3px solid #f8bbd0;
+        }
+        
+        .music-control {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: rgba(216, 27, 96, 0.2);
+            border-radius: 50px;
+            display: inline-block;
+        }
+        
+        button {
+            background-color: #e91e63;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 0 5px;
+            font-family: Arial, sans-serif;
+        }
+        
+        button:hover {
+            background-color: #c2185b;
+        }
+    </style>
+</head>
+<body>
+    <div class="letter-container">
+        <h1>My Dearest Love</h1>
+        
+        <div class="heart-image">
+            <img src="https://i.pinimg.com/originals/84/71/11/847111f2a8e9a9c0a3a3e3e3e3e3e3e.jpg" alt="Heart" style="width:100%; border-radius:8px;">
+        </div>
+        
+        <div class="letter-content">
+            <p>My darling,</p>
+            
+            <p>As I sit here thinking of you, my heart overflows with emotions that words can scarcely capture. Each moment with you feels like a beautiful dream I never want to wake from.</p>
+            
+            <p>Your smile brightens my darkest days, your laughter is the melody that plays in my heart, and your love is the strength that carries me through life's challenges.</p>
+            
+            <p>I cherish the way you understand me without words, the way you hold me when I'm vulnerable, and the way you love me unconditionally. You've shown me what true love means, and for that, I am eternally grateful.</p>
+            
+            <p>No matter where life takes us, know that my love for you will remain constant, like the stars that forever shine in the night sky.</p>
+            
+            <p>Forever yours,</p>
+        </div>
+        
+        <div class="signature">[Your Name]</div>
+        
+        <div class="music-control">
+            <button onclick="document.getElementById('bgMusic').play()">Play Music</button>
+            <button onclick="document.getElementById('bgMusic').pause()">Pause Music</button>
+        </div>
+        
+        <audio id="bgMusic" loop>
+            <source src="10000.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+</body>
+</html>
