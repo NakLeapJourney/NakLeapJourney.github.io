@@ -431,12 +431,38 @@
         padding: 15px;
       }
     }
+    .title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 3.5rem;
+      color: #ff6b81; /* Soft romantic pink */
+      text-shadow: 0 0 15px rgba(255, 107, 129, 0.6);
+      margin-bottom: 30px;
+      text-align: center;
+      z-index: 2;
+    }
+        /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .title {
+        font-size: 2.5rem;
+      }
+    }
+
+    @media (max-height: 600px) {
+      .title {
+        font-size: 2rem;
+        margin-bottom: 15px;
+      }
+    }
   </style>
 </head>
 <body>
   <!-- Kawaii clouds -->
   <div class="kawaii-cloud" style="top: 10%; left: 5%;">(´｡• ω •｡`)</div>
   <div class="kawaii-cloud" style="bottom: 15%; right: 5%;">(◕‿◕✿)</div>
+  
+
+  <!-- Title -->
+  <h1 class="title">My Letter For You</h1>
 
   <!-- Floating hearts container -->
   <div id="hearts-container"></div>

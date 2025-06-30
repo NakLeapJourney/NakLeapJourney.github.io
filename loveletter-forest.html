@@ -3,27 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Moonlight Love Letter</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌙</text></svg>">
+  <title>Forest Love Letter</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌲</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <style>
-    body {
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-      font-family: 'Playfair Display', serif;
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: linear-gradient(rgba(13, 27, 30, 0.7), rgba(28, 60, 43, 0.7)), 
+                  url('https://images.unsplash.com/photo-1448375240586-882707db888b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      font-family: 'Playfair Display', serif;
       height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       overflow: hidden;
-      color: #e6e6ff;
-      cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path fill='%23b19cd9' d='M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z'/></svg>"), auto;
+      color: #e6f8b2;
+      cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path fill='%238cbc69' d='M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z'/></svg>"), auto;
+      position: relative;
     }
 
-    /* Stars background */
-    .stars {
+    /* Fireflies background */
+    .fireflies {
       position: fixed;
       top: 0;
       left: 0;
@@ -33,63 +42,47 @@
       pointer-events: none;
     }
 
-    .star {
+    .firefly {
       position: absolute;
-      background-color: #fff;
+      background-color: #e6f8b2;
       border-radius: 50%;
-      animation: twinkle var(--duration) infinite ease-in-out;
-    }
-
-    @keyframes twinkle {
-      0%, 100% { opacity: 0.2; }
-      50% { opacity: 1; }
-    }
-
-    /* Moon animation */
-    .moon-container {
-      position: absolute;
-      width: 120px;
-      height: 120px;
-      top: 15%;
-      right: 10%;
+      animation: floatFirefly var(--duration) infinite ease-in-out, blink var(--duration) infinite ease-in-out;
+      box-shadow: 0 0 10px 2px #e6f8b2;
       z-index: 1;
     }
 
-    .moon {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background: linear-gradient(145deg, #f5f7fa, #e4e8f0);
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
-      animation: spin 20s linear infinite;
+    @keyframes floatFirefly {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(20px, -20px); }
     }
 
-    .moon-crater {
-      position: absolute;
-      background-color: rgba(200, 200, 210, 0.5);
-      border-radius: 50%;
+    @keyframes blink {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
     }
 
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    /* Celestial envelope */
+    /* Forest envelope */
     #envelope {
       position: relative;
       width: 280px;
       height: 180px;
       border-bottom-left-radius: 6px;
       border-bottom-right-radius: 6px;
-      background: linear-gradient(145deg, #3a3a5a, #2a2a4a);
+      background: linear-gradient(145deg, #2d4d3d, #1e3c2d);
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 
-                  0 0 15px rgba(138, 43, 226, 0.4);
+                  0 0 15px rgba(76, 140, 43, 0.4);
       cursor: pointer;
       margin: 20px 0;
       z-index: 2;
-      border: 1px solid #6a5acd;
+      transition: transform 0.3s ease;
+      outline: 1px solid rgba(76, 140, 43, 0.6);
+    }
+
+    #envelope:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 
+                  0 0 20px rgba(76, 140, 43, 0.6);
+      outline: 1px solid rgba(76, 140, 43, 0.9);
     }
 
     .front {
@@ -103,24 +96,26 @@
       border-left: 140px solid transparent;
       border-right: 140px solid transparent;
       border-bottom: 82px solid transparent;
-      border-top: 98px solid #483d8b;
+      border-top: 98px solid #2d4d3d;
       transform-origin: top;
       pointer-events: none;
-      filter: drop-shadow(0 -2px 5px rgba(106, 90, 205, 0.5));
+      filter: drop-shadow(0 -2px 5px rgba(76, 140, 43, 0.5));
+      outline: none; /* Removed outline from flap */
     }
 
     .pocket {
-      border-left: 140px solid #4b0082;
-      border-right: 140px solid #4b0082;
-      border-bottom: 90px solid #483d8b;
+      border-left: 140px solid #1e3c2d;
+      border-right: 140px solid #1e3c2d;
+      border-bottom: 90px solid #2d4d3d;
       border-top: 90px solid transparent;
       border-bottom-left-radius: 6px;
       border-bottom-right-radius: 6px;
+      outline: none; /* Removed outline from pocket */
     }
 
     .letter {
       position: relative;
-      background: linear-gradient(to bottom, #3a3a5a, #2a2a4a);
+      background: linear-gradient(to bottom, #2d4d3d, #1e3c2d);
       width: 90%;
       margin-left: auto;
       margin-right: auto;
@@ -128,8 +123,8 @@
       top: 5%;
       border-radius: 6px;
       box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5), 
-                  0 2px 26px rgba(106, 90, 205, 0.3);
-      border: 1px solid #6a5acd;
+                  0 2px 26px rgba(76, 140, 43, 0.3);
+      outline: none; /* Removed outline from letter */
     }
 
     .letter:after {
@@ -139,22 +134,17 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background-image: radial-gradient(circle at 20% 30%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 70%, rgba(147, 112, 219, 0.1) 0%, transparent 50%);
+      background-image: radial-gradient(circle at 20% 30%, rgba(76, 140, 43, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 70%, rgba(76, 140, 43, 0.1) 0%, transparent 50%);
     }
 
-    .constellation {
+    .leaf-pattern {
       position: absolute;
       width: 100%;
       height: 100%;
       background-image: 
-        radial-gradient(1px 1px at 20px 30px, white 1px, transparent 2px),
-        radial-gradient(1px 1px at 40px 70px, white 1px, transparent 2px),
-        radial-gradient(1px 1px at 80px 40px, white 1px, transparent 2px),
-        radial-gradient(1px 1px at 120px 80px, white 1px, transparent 2px),
-        radial-gradient(1px 1px at 160px 30px, white 1px, transparent 2px),
-        radial-gradient(1px 1px at 200px 60px, white 1px, transparent 2px);
-      background-size: 100% 100%;
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234c8c2b' opacity='0.3'%3E%3Cpath d='M17 8C8 10 5.9 16.17 3.82 21.34l-1.89-.68C4.74 15.85 7.2 8.72 17 6c-2.93 1.8-5.94 4.55-8 7.62 2.85-1.82 5.5-3.62 8-5.62z'/%3E%3C/svg%3E");
+      background-size: 30px;
       opacity: 0.7;
     }
 
@@ -163,7 +153,7 @@
       left: 10%;
       width: 80%;
       height: 14%;
-      background-color: rgba(106, 90, 205, 0.3);
+      background-color: rgba(76, 140, 43, 0.3);
       border-radius: 2px;
     }
 
@@ -210,19 +200,29 @@
       z-index: 2;
     }
 
-    /* Shooting stars */
-    .shooting-star {
+    /* Falling leaves */
+    .falling-leaf {
       position: absolute;
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background-color: white;
-      box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.5);
+      width: 20px;
+      height: 20px;
       opacity: 0;
       z-index: 1;
+      pointer-events: none;
     }
 
-    /* Love Letter Popup - Adjusted to fit content without scrolling */
+    /* Forest bottom silhouette */
+    .forest-bottom {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100px;
+      background: linear-gradient(to top, rgba(13, 27, 30, 0.9), transparent);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Love Letter Popup - Adjusted to match standard version */
     .love-letter-popup {
       position: fixed;
       top: 50%;
@@ -232,17 +232,34 @@
       max-width: 500px;
       height: auto;
       max-height: 85vh;
-      background: linear-gradient(to bottom, #1a1a2e, #16213e);
-      padding: 25px;
+      background: linear-gradient(to bottom, #1a2e1e, #1c3c2b);
+      padding: 20px;
       border-radius: 15px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 
-                  inset 0 0 15px rgba(138, 43, 226, 0.3);
+                  inset 0 0 15px rgba(76, 140, 43, 0.3);
       z-index: 1000;
       opacity: 0;
       transition: all 0.5s ease;
-      border: 1px solid #6a5acd;
+      border: 1px solid #4c8c2b;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
+      backdrop-filter: blur(3px);
+    }
+
+    .love-letter-popup:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('https://images.unsplash.com/photo-1448375240586-882707db888b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.15;
+      border-radius: 15px;
+      z-index: -1;
     }
 
     .love-letter-popup.active {
@@ -260,15 +277,15 @@
     }
 
     .love-letter-content h2 {
-      color: #b19cd9;
+      color: #a5d6a7;
       margin: 10px 0;
       font-family: 'Dancing Script', cursive;
       font-size: clamp(1.8rem, 4vw, 2.2rem);
-      text-shadow: 0 0 10px rgba(177, 156, 217, 0.5);
+      text-shadow: 0 0 10px rgba(165, 214, 167, 0.5);
     }
 
     .love-letter-content p {
-      color: #e6e6ff;
+      color: #e6f8b2;
       line-height: 1.5;
       margin: 8px 0;
       font-size: clamp(0.9rem, 2vw, 1rem);
@@ -277,14 +294,14 @@
     }
 
     .love-letter-image {
-      width: 100px;
-      height: 100px;
+      width: 120px;
+      height: 120px;
       margin: 0 auto 10px;
       border-radius: 50%;
       overflow: hidden;
-      border: 3px solid #b19cd9;
-      box-shadow: 0 0 15px rgba(177, 156, 217, 0.5);
-      background: #1a1a2e;
+      border: 3px solid #a5d6a7;
+      box-shadow: 0 0 15px rgba(165, 214, 167, 0.5);
+      background: #1a2e1e;
     }
 
     .love-letter-image img {
@@ -295,10 +312,10 @@
 
     .close-popup {
       position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 24px;
-      color: #b19cd9;
+      top: 8px;
+      right: 12px;
+      font-size: 22px;
+      color: #a5d6a7;
       cursor: pointer;
       background: none;
       border: none;
@@ -309,7 +326,7 @@
 
     .close-popup:hover {
       transform: scale(1.2);
-      color: #e6e6ff;
+      color: #e6f8b2;
     }
 
     .overlay {
@@ -334,16 +351,16 @@
     .signature {
       font-family: 'Dancing Script', cursive;
       font-size: clamp(1.3rem, 3vw, 1.6rem);
-      color: #b19cd9;
+      color: #a5d6a7;
       margin-top: 10px;
       text-align: right;
       padding-right: 20px;
-      text-shadow: 0 0 5px rgba(177, 156, 217, 0.5);
+      text-shadow: 0 0 5px rgba(165, 214, 167, 0.5);
     }
 
     .date {
       font-style: italic;
-      color: #a0a0c0;
+      color: #a0c0a0;
       margin-top: 2px;
       text-align: right;
       padding-right: 20px;
@@ -351,14 +368,15 @@
       margin-bottom: 5px;
     }
 
-    /* Floating celestial elements */
-    .celestial {
+    /* Floating forest elements */
+    .forest-element {
       position: absolute;
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       z-index: 0;
       pointer-events: none;
       animation: float 8s ease-in-out infinite;
       opacity: 0.7;
+      text-shadow: 0 0 5px rgba(165, 214, 167, 0.5);
     }
 
     @keyframes float {
@@ -370,20 +388,50 @@
     .title {
       font-family: 'Dancing Script', cursive;
       font-size: 3.5rem;
-      color: #ff6b81; /* Soft romantic pink */
-      text-shadow: 0 0 15px rgba(255, 107, 129, 0.6);
+      color: #a5d6a7;
+      text-shadow: 0 0 15px rgba(76, 140, 43, 0.8);
       margin-bottom: 30px;
       text-align: center;
       z-index: 2;
     }
-        /* Responsive adjustments */
+
+    /* Responsive adjustments */
     @media (max-width: 768px) {
+      .love-letter-popup {
+        width: 90%;
+        padding: 15px;
+      }
+      
+      .love-letter-image {
+        width: 80px;
+        height: 80px;
+      }
+      
       .title {
         font-size: 2.5rem;
       }
     }
 
     @media (max-height: 600px) {
+      .love-letter-image {
+        width: 70px;
+        height: 70px;
+      }
+      .love-letter-content p {
+        line-height: 1.3;
+        margin: 5px 0;
+        font-size: 0.8rem;
+      }
+      .love-letter-popup {
+        padding: 15px;
+      }
+      .love-letter-content h2 {
+        font-size: 1.5rem;
+      }
+      .signature {
+        font-size: 1.2rem;
+      }
+      
       .title {
         font-size: 2rem;
         margin-bottom: 15px;
@@ -392,24 +440,22 @@
   </style>
 </head>
 <body>
-  <!-- Stars background -->
-  <div class="stars" id="stars"></div>
+  <!-- Fireflies background -->
+  <div class="fireflies" id="fireflies"></div>
   
-  <!-- Moon with craters -->
-  <div class="moon-container">
-    <div class="moon" id="moon"></div>
-  </div>
+  <!-- Forest silhouette at bottom -->
+  <div class="forest-bottom"></div>
   
   <!-- Title -->
   <h1 class="title">My Letter For You</h1>
-
-  <!-- Floating celestial elements -->
-  <div class="celestial" style="top: 15%; left: 10%;">✦</div>
-  <div class="celestial" style="top: 80%; left: 85%; animation-delay: 2s;">✧</div>
-  <div class="celestial" style="top: 60%; left: 15%; animation-delay: 4s;">✶</div>
+  
+  <!-- Floating forest elements -->
+  <div class="forest-element" style="top: 15%; left: 10%;">🍃</div>
+  <div class="forest-element" style="top: 80%; left: 85%; animation-delay: 2s;">🍂</div>
+  <div class="forest-element" style="top: 60%; left: 15%; animation-delay: 4s;">🌿</div>
   
   <!-- Audio Element (hidden) -->
-  <audio id="loveSong" loop>
+  <audio id="forestSound" loop>
     <source src="10000.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
@@ -418,7 +464,7 @@
     <div class="front flap"></div>
     <div class="front pocket"></div>
     <div class="letter">
-      <div class="constellation"></div>
+      <div class="leaf-pattern"></div>
       <div class="words line1"></div>
       <div class="words line2"></div>
       <div class="words line3"></div>
@@ -432,7 +478,7 @@
     <button class="close-popup" id="closePopup">×</button>
     <div class="love-letter-content">
       <div class="love-letter-image">
-        <img src="https://i.pinimg.com/474x/5f/bf/73/5fbf73b435a9e67cb1d3c4ca7c0d99b7.jpg" alt="Moonlit Couple">
+        <img src="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=200&w=200" alt="Forest Couple">
       </div>
       <h2>My Dearest Love</h2>
       <p>
@@ -453,99 +499,67 @@
 
   <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js'></script>
   <script>
-    // Create stars background
-    function createStars() {
-      const container = document.getElementById('stars');
-      const count = 150;
+    // Create fireflies background
+    function createFireflies() {
+      const container = document.getElementById('fireflies');
+      const count = 80;
       
       for (let i = 0; i < count; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
+        const firefly = document.createElement('div');
+        firefly.className = 'firefly';
         
         // Random positioning
-        star.style.left = Math.random() * 100 + 'vw';
-        star.style.top = Math.random() * 100 + 'vh';
+        firefly.style.left = Math.random() * 100 + 'vw';
+        firefly.style.top = Math.random() * 100 + 'vh';
         
-        // Random size (1px to 3px)
-        const size = Math.random() * 2 + 1;
-        star.style.width = size + 'px';
-        star.style.height = size + 'px';
+        // Random size (2px to 5px)
+        const size = Math.random() * 3 + 2;
+        firefly.style.width = size + 'px';
+        firefly.style.height = size + 'px';
         
-        // Random animation duration (3s to 8s)
-        star.style.setProperty('--duration', Math.random() * 5 + 3 + 's');
+        // Random animation duration (4s to 9s)
+        firefly.style.setProperty('--duration', Math.random() * 5 + 4 + 's');
         
         // Random delay
-        star.style.animationDelay = Math.random() * 5 + 's';
+        firefly.style.animationDelay = Math.random() * 5 + 's';
         
-        container.appendChild(star);
+        container.appendChild(firefly);
       }
     }
     
-    // Add craters to moon
-    function addMoonCraters() {
-      const moon = document.getElementById('moon');
-      const craterCount = 8;
+    // Create falling leaves
+    function createFallingLeaf() {
+      const fallingLeaf = document.createElement('div');
+      fallingLeaf.className = 'falling-leaf';
       
-      for (let i = 0; i < craterCount; i++) {
-        const crater = document.createElement('div');
-        crater.className = 'moon-crater';
-        
-        // Random positioning
-        const angle = Math.random() * Math.PI * 2;
-        const distance = Math.random() * 30 + 10;
-        const x = 50 + Math.cos(angle) * distance;
-        const y = 50 + Math.sin(angle) * distance;
-        
-        crater.style.left = x + '%';
-        crater.style.top = y + '%';
-        
-        // Random size
-        const size = Math.random() * 15 + 5;
-        crater.style.width = size + 'px';
-        crater.style.height = size + 'px';
-        
-        moon.appendChild(crater);
-      }
-    }
-    
-    // Create shooting stars
-    function createShootingStar() {
-      const shootingStar = document.createElement('div');
-      shootingStar.className = 'shooting-star';
+      // Use leaf emoji
+      fallingLeaf.innerHTML = '🍃';
+      fallingLeaf.style.fontSize = (Math.random() * 15 + 15) + 'px';
+      fallingLeaf.style.color = `rgb(${Math.random()*50 + 150}, ${Math.random()*50 + 180}, ${Math.random()*50 + 100})`;
       
       // Random start position
       const startX = Math.random() * 100;
-      const startY = Math.random() * 30;
-      shootingStar.style.left = startX + 'vw';
-      shootingStar.style.top = startY + 'vh';
+      fallingLeaf.style.left = startX + 'vw';
+      fallingLeaf.style.top = '-50px';
       
-      // Random size (2px to 5px)
-      const size = Math.random() * 3 + 2;
-      shootingStar.style.width = size + 'px';
-      shootingStar.style.height = size + 'px';
+      document.body.appendChild(fallingLeaf);
       
-      document.body.appendChild(shootingStar);
+      // Animate falling leaf
+      const endX = startX + Math.random() * 30 - 15;
+      const duration = Math.random() * 8 + 8;
       
-      // Animate shooting star
-      const angle = Math.random() * 30 + 15;
-      const distance = 100;
-      const endX = startX + Math.cos(angle * Math.PI / 180) * distance;
-      const endY = startY + Math.sin(angle * Math.PI / 180) * distance;
-      
-      const duration = Math.random() * 2 + 1;
-      
-      const animation = shootingStar.animate([
+      const animation = fallingLeaf.animate([
         { 
-          transform: 'translate(0, 0)',
+          transform: 'translate(0, 0) rotate(0deg)',
           opacity: 0
         },
         { 
-          transform: `translate(${endX - startX}vw, ${endY - startY}vh)`,
+          transform: `translate(${endX - startX}vw, 20vh) rotate(180deg)`,
           opacity: 1
         },
         { 
-          transform: `translate(${(endX - startX) * 1.2}vw, ${(endY - startY) * 1.2}vh)`,
-          opacity: 0
+          transform: `translate(${(endX - startX)*2}vw, 100vh) rotate(360deg)`,
+          opacity: 0.5
         }
       ], {
         duration: duration * 1000,
@@ -553,25 +567,25 @@
       });
       
       animation.onfinish = () => {
-        shootingStar.remove();
+        fallingLeaf.remove();
       };
     }
     
-    // Initialize stars, moon craters and shooting stars
+    // Initialize fireflies and falling leaves
     window.addEventListener('load', () => {
-      createStars();
-      addMoonCraters();
+      createFireflies();
       
-      // Create shooting stars periodically
+      // Create falling leaves periodically
       setInterval(() => {
-        if (Math.random() > 0.7) { // 30% chance to create a shooting star
-          createShootingStar();
+        if (Math.random() > 0.5) { // 50% chance to create a falling leaf
+          createFallingLeaf();
         }
-      }, 3000);
+      }, 2000);
       
-      // Initial shooting stars
-      setTimeout(() => createShootingStar(), 1000);
-      setTimeout(() => createShootingStar(), 2500);
+      // Initial falling leaves
+      setTimeout(() => createFallingLeaf(), 500);
+      setTimeout(() => createFallingLeaf(), 1500);
+      setTimeout(() => createFallingLeaf(), 2500);
     });
     
     // Envelope and popup functionality
@@ -580,17 +594,17 @@
       var loveLetter = $("#loveLetter");
       var overlay = $("#overlay");
       var closePopup = $("#closePopup");
-      var loveSong = document.getElementById("loveSong");
+      var forestSound = document.getElementById("forestSound");
       
       function open() {
         envelope.addClass("open").removeClass("close");
-        loveSong.play();
+        forestSound.play();
         setTimeout(function() {
           loveLetter.addClass("active");
           overlay.addClass("active");
-          // Create a burst of shooting stars when opening
-          for (let i = 0; i < 3; i++) {
-            setTimeout(() => createShootingStar(), i * 300);
+          // Create falling leaves when opening
+          for (let i = 0; i < 5; i++) {
+            setTimeout(() => createFallingLeaf(), i * 300);
           }
         }, 1000);
       }
@@ -599,8 +613,8 @@
         envelope.addClass("close").removeClass("open");
         loveLetter.removeClass("active");
         overlay.removeClass("active");
-        loveSong.pause();
-        loveSong.currentTime = 0;
+        forestSound.pause();
+        forestSound.currentTime = 0;
       }
       
       envelope.click(open);
